@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<!-- saved from url=(0067)https://cesiumjs.org/data-and-assets/terrain/formats/heightmap-1.0/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+
+  <title>heightmap-1.0 terrain format | cesiumjs.org</title>
+
+  
+  <meta name="description" content="Our mission is to create the leading web-based globe and map for visualizing dynamic data. We strive for the best possible performance, precision, visual quality, ease of use, platform support, and content.">
+
+  <link rel="stylesheet" href="./heightmap-1.0 terrain format _ cesiumjs.org_files/main.css">
+  <link rel="canonical" href="https://cesiumjs.org/data-and-assets/terrain/formats/heightmap-1.0/">
+  <link rel="alternate" type="application/rss+xml" title="cesiumjs.org" href="https://cesiumjs.org/feed.xml">
+
+  <script async="" src="./heightmap-1.0 terrain format _ cesiumjs.org_files/analytics.js"></script><script src="./heightmap-1.0 terrain format _ cesiumjs.org_files/jquery.min.js"></script>
+  <script src="./heightmap-1.0 terrain format _ cesiumjs.org_files/bootstrap.js"></script>
+</head>
+
+
+<body>
+
+<header class="site-header site-header-page">
+    <nav class="navbar-default">
+    <div class="navbar navbar-primary">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="fa fa-lg fa-bars"></span>
+                        </button>
+                        <a class="navbar-brand" href="https://cesiumjs.org/index.html">
+                            <img class="navbar-brand-icon" src="./heightmap-1.0 terrain format _ cesiumjs.org_files/Logo_Color_White.svg" alt="cesium">
+                        </a>
+                    </div>
+
+                    <div class="collapse navbar-collapse" id="navbar-collapse-1">
+                        <ul class="nav navbar-nav">
+                            
+                            <li>
+                                <a href="https://cesiumjs.org/about">About</a>
+                                
+                            </li>
+                            
+                            <li>
+                                <a href="https://cesiumjs.org/demos/">Demos</a>
+                                
+                            </li>
+                            
+                            <li>
+                                <a href="https://cesiumjs.org/downloads/">Downloads</a>
+                                
+                            </li>
+                            
+                            <li>
+                                <a href="https://cesiumjs.org/data-and-assets/terrain/formats/heightmap-1.0/" class="dropdown-toggle hidden-xs" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Developers <span class="fa fa-caret-down"></span></a>
+                                
+                                <a href="https://cesiumjs.org/tutorials/" class="visible-xs">Developers</a>
+                                <ul class="dropdown-menu hidden-xs">
+                                    
+                                    <li><a href="https://cesiumjs.org/tutorials/">Tutorials</a></li>
+                                    
+                                    <li><a href="https://cesiumjs.org/refdoc/">API Documentation</a></li>
+                                    
+                                    <li><a href="https://cesiumjs.org/Cesium/Build/Apps/Sandcastle/">Code Examples</a></li>
+                                    
+                                </ul>
+                                
+                            </li>
+                            
+                            <li>
+                                <a href="https://groups.google.com/forum/#!forum/cesium-dev">Forum</a>
+                                
+                            </li>
+                            
+                        </ul>
+
+                        <ul class="nav navbar-nav navbar-right">
+                            <li>
+                                <a class="social social-github" href="https://github.com/AnalyticalGraphicsInc">
+    <span class="fa fa-lg fa-github"></span>
+</a>
+
+                            </li>
+                            <li>
+                                <a class="social social-twitter" href="https://twitter.com/CesiumJS">
+    <span class="fa fa-lg fa-twitter"></span>
+</a>
+
+                            </li>
+                            <li id="navbar-cesium-com-link"><a href="https://cesium.com/">cesium.com <span class="fa fa-arrow-circle-right"></span></a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+</header>
+
+<div class="page-content subpage">
+    <div class="container-fluid">
+
+        <div class="page-section">
+            <div class="row">
+                <div class="col-lg-6 col-sm-8 col-xs-10 col-xs-offset-1">
+
+                
+                
+
+                <nav class="breadcrumb">
+                    
+                        
+                        
+                        <a class="breadcrumb-item" href="https://cesiumjs.org/"><span class="fa fa-globe"></span></a> /
+                        
+                    
+                        
+                        
+                        <a class="breadcrumb-item" href="https://cesiumjs.org/data-and-assets/">data-and-assets</a> /
+                        
+                    
+                        
+                        
+                        <a class="breadcrumb-item" href="https://cesiumjs.org/data-and-assets/terrain/">terrain</a> /
+                        
+                    
+                        
+                        
+                        <a class="breadcrumb-item" href="https://cesiumjs.org/data-and-assets/terrain/formats/">formats</a> /
+                        
+                    
+                        
+                        
+                        <span class="breadcrumb-item active">heightmap-1.0</span>
+                        
+                    
+                </nav>
+
+                <h1>heightmap-1.0 terrain format</h1>
+
+                <p>
+    A <a href="https://cesiumjs.org/data-and-assets/terrain/formats/index.html">terrain tileset</a> in <code>heightmap-1.0</code> format is simple multi-resolution quadtree pyramid of heightmaps according to the <a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification">Tile Map Service (TMS)</a> layout and global-geodetic profile.  All tiles have the extension <code>.terrain</code>.  So, if the Tiles URL for a tileset is:
+</p>
+
+<figure class="highlight"><pre><code class="language-text" data-lang="text">//cesiumjs.org/tilesets/terrain/smallterrain</code></pre></figure>
+
+<p>
+    Then the two root files of the pyramid are found at these URLs:
+</p>
+<ul>
+    <li>(-180 deg, -90 deg) - (0 deg, 90 deg) - <a href="https://cesiumjs.org/tilesets/terrain/smallterrain/0/0/0.terrain">//cesiumjs.org/tilesets/terrain/smallterrain/0/0/0.terrain</a></li>
+    <li>(0 deg, -90 deg) - (180 deg, 90 deg) - <a href="https://cesiumjs.org/tilesets/terrain/smallterrain/0/1/0.terrain">//cesiumjs.org/tilesets/terrain/smallterrain/0/1/0.terrain</a></li>
+</ul>
+<p>
+    The eight tiles at the next level are found at these URLs:
+</p>
+<ul>
+    <li>(-180 deg, -90 deg) - (-90 deg, 0 deg) - <a href="https://cesiumjs.org/tilesets/terrain/smallterrain/1/0/0.terrain">//cesiumjs.org/tilesets/terrain/smallterrain/1/0/0.terrain</a></li>
+    <li>(-90 deg, -90 deg) - (0 deg, 0 deg) - <a href="https://cesiumjs.org/tilesets/terrain/smallterrain/1/1/0.terrain">//cesiumjs.org/tilesets/terrain/smallterrain/1/1/0.terrain</a></li>
+    <li>(0 deg, -90 deg) - (90 deg, 0 deg) - <a href="https://cesiumjs.org/tilesets/terrain/smallterrain/1/2/0.terrain">//cesiumjs.org/tilesets/terrain/smallterrain/1/2/0.terrain</a></li>
+    <li>(90 deg, -90 deg) - (180 deg, 0 deg) - <a href="https://cesiumjs.org/tilesets/terrain/smallterrain/1/3/0.terrain">//cesiumjs.org/tilesets/terrain/smallterrain/1/3/0.terrain</a></li>
+    <li>(-180 deg, 0 deg) - (-90 deg, 90 deg) - <a href="https://cesiumjs.org/tilesets/terrain/smallterrain/1/0/1.terrain">//cesiumjs.org/tilesets/terrain/smallterrain/1/0/1.terrain</a></li>
+    <li>(-90 deg, 0 deg) - (0 deg, 90 deg) - <a href="https://cesiumjs.org/tilesets/terrain/smallterrain/1/1/1.terrain">//cesiumjs.org/tilesets/terrain/smallterrain/1/1/1.terrain</a></li>
+    <li>(0 deg, 0 deg) - (90 deg, 90 deg) - <a href="https://cesiumjs.org/tilesets/terrain/smallterrain/1/2/1.terrain">//cesiumjs.org/tilesets/terrain/smallterrain/1/2/1.terrain</a></li>
+    <li>(90 deg, 0 deg) - (180 deg, 90 deg) - <a href="https://cesiumjs.org/tilesets/terrain/smallterrain/1/3/1.terrain">//cesiumjs.org/tilesets/terrain/smallterrain/1/3/1.terrain</a></li>
+</ul>
+<p>
+    The tiles are 65x65 vertices and overlap their neighbors at their edges. In other words, at the root, the eastern-most column of heights in the western tile is identical to the western-most column of heights in the eastern tile.
+</p>
+<p>
+    Terrain tiles are served gzipped. Once extracted, they are at least 8,452 bytes in size. The first and most important part of the file is a simple array of 16-bit, little-endian, integer heights arranged from north to south and from west to east - the first 2 bytes are the height in the northwest corner, and the next 2 bytes are the height at the location just to the east of there. Each height is the number of 1/5 meter units above -1000 meters. The total size of the post data is <code>65 * 65 * 2 = 8450</code> bytes.
+</p>
+<p>
+    Following the height data is one additional byte which is a bit mask indicating which child tiles are present. The bit values are as follows:
+</p>
+<ul>
+    <li>Southwest - bit 0 - value 1</li>
+    <li>Southeast - bit 1 - value 2</li>
+    <li>Northwest - bit 2 - value 4</li>
+    <li>Northeast - bit 3 - value 8</li>
+</ul>
+<p>
+    If a bit is set, the corresponding <code>.terrain</code> file can be expected to be found on the server as well. If it is cleared, requesting the <code>.terrain</code> file will return a 404 error.
+</p>
+<p>
+    The child bit mask is followed by the water mask. The water mask is either 1 byte, in the case that the tile is all land or all water, or it is <code>256 * 256 * 1 = 65536</code> bytes if the tile has a mix of land and water. Each mask value is 0 for land and 255 for water. Values between 0 and 255 are allowed as well (but not currently present in the data) in order to support anti-aliasing of the coastline.
+</p>
+
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<footer>
+    <div class="container">
+        <div class="footer">
+            <div class="row">
+
+                <div class="col-md-6 col-xs-12">
+                    <div class="footer-brand">
+                        <div class="footer-brand-logos">
+                            <a href="https://cesiumjs.org/about/" id="footer-cesium-logo"><img class="img-responsive" src="./heightmap-1.0 terrain format _ cesiumjs.org_files/CesiumConsortium_4color.png" alt="Cesium Consortium"></a>
+                            <div class="footer-brand-logos-corporate">
+                                <a href="https://www.agi.com/"><img id="footer-agi-logo" src="./heightmap-1.0 terrain format _ cesiumjs.org_files/Logo_Color_Black.svg" alt="AGI"></a>
+                                <a href="https://www.bentley.com/"><img id="footer-bentley-logo" src="./heightmap-1.0 terrain format _ cesiumjs.org_files/Logo_Color.svg" alt="Bentley"></a>
+                                <a href="http://www.rafael.co.il/"><img id="footer-rafael-logo" src="./heightmap-1.0 terrain format _ cesiumjs.org_files/rafael_logo.svg" alt="Rafael"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-xs-12" id="footer-links">
+                    <div class="row">
+
+                        
+                        <div class="col-xs-4">
+                            <h4>Overview</h4>
+                            <ul class="list-unstyled">
+                                
+                                <li><a href="https://cesiumjs.org/index.html">Home</a></li>
+                                
+                                <li><a href="https://cesiumjs.org/features/">Features</a></li>
+                                
+                                <li><a href="https://cesiumjs.org/downloads/">Downloads</a></li>
+                                
+                                <li><a href="https://cesiumjs.org/demos/">Demos</a></li>
+                                
+                                <li><a href="https://cesiumjs.org/about/">About</a></li>
+                                
+
+                            </ul>
+                        </div>
+                        
+                        <div class="col-xs-4">
+                            <h4>Developers</h4>
+                            <ul class="list-unstyled">
+                                
+                                <li><a href="https://cesiumjs.org/tutorials/">Tutorials</a></li>
+                                
+                                <li><a href="https://cesiumjs.org/refdoc/">API Documentation</a></li>
+                                
+                                <li><a href="https://cesiumjs.org/Cesium/Build/Apps/Sandcastle/">Code Examples</a></li>
+                                
+                                <li><a href="https://cesiumjs.org/troubleshooting">Troubleshooting</a></li>
+                                
+
+                            </ul>
+                        </div>
+                        
+
+                        <div class="col-xs-4">
+                            <h4>Contact</h4>
+                            <ul class="list-unstyled">
+                                <li><a href="https://groups.google.com/forum/#!forum/cesium-dev">Cesium Forum</a></li>
+                                <li><a href="mailto:tim@cesium.com">Email Tim</a></li>
+                            </ul>
+
+                            <div class="row" id="footer-social">
+                                <div class="col-xs-12">
+                                    <a href="https://twitter.com/CesiumJS">
+                                        <span class="fa fa-lg fa-fw fa-twitter"></span>
+                                    </a>
+                                    <a href="https://github.com/AnalyticalGraphicsInc/cesium">
+                                        <span class="fa fa-lg fa-fw fa-github"></span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="./heightmap-1.0 terrain format _ cesiumjs.org_files/analytics(1).js"></script>
+<script type="text/javascript" src="./heightmap-1.0 terrain format _ cesiumjs.org_files/cookies.js"></script>
+
+<div class="footer-cookies" style="display: block;">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-12">
+                <p>
+                This site uses cookies and other tracking technologies to improve your experience and to promote and improve our services.
+                By using our site, you agree to our <a href="https://cesiumjs.org/legal/cookie-policy/">Cookie Policy</a>.
+                </p>
+                <a href="https://cesiumjs.org/data-and-assets/terrain/formats/heightmap-1.0/#" class="btn btn-sm btn-default" id="confirm-cookies">I agree</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+</body></html>

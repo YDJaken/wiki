@@ -1,0 +1,2 @@
+table.wikitable,table.prettytable{margin:1em 1em 1em 0;background:#F9F9F9;border:1px #AAA solid;border-collapse:collapse}table.wikitable th,table.wikitable td,table.prettytable th,table.prettytable td{border:1px #AAA solid;padding:0.2em}table.wikitable th,table.prettytable th{background:#F2F2F2;text-align:center}table.wikitable caption,table.prettytable caption{margin-left:inherit;margin-right:inherit}
+/* cache key: osgeo_wiki-osgeo_:resourceloader:filter:minify-css:7:25a06e8908830d51b094f0407c547d6f */

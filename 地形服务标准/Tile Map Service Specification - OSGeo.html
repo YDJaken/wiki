@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<!-- saved from url=(0057)http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification -->
+<html lang="en" dir="ltr" class="client-js"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>Tile Map Service Specification - OSGeo</title>
+<meta name="generator" content="MediaWiki 1.25.3">
+<link rel="ExportRDF" type="application/rdf+xml" title="Tile Map Service Specification" href="http://wiki.osgeo.org/index.php?title=Special:ExportRDF/Tile_Map_Service_Specification&amp;xmlmime=rdf">
+<link rel="shortcut icon" href="http://wiki.osgeo.org/skins/common/images/favicon.ico">
+<link rel="search" type="application/opensearchdescription+xml" href="http://wiki.osgeo.org/opensearch_desc.php" title="OSGeo (en)">
+<link rel="EditURI" type="application/rsd+xml" href="http://wiki.osgeo.org/api.php?action=rsd">
+<link rel="alternate" hreflang="x-default" href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification">
+<link rel="copyright" href="http://creativecommons.org/licenses/by-sa/2.5/legalcode">
+<link rel="alternate" type="application/atom+xml" title="OSGeo Atom feed" href="http://wiki.osgeo.org/index.php?title=Special:RecentChanges&amp;feed=atom">
+<link rel="stylesheet" href="./Tile Map Service Specification - OSGeo_files/load.php">
+<link rel="stylesheet" href="./Tile Map Service Specification - OSGeo_files/load(1).php">
+<style>
+.qtip{position:absolute;left:-28000px;top:-28000px;display:none;max-width:280px;min-width:50px;font-size:10.5px;line-height:12px;direction:ltr;box-shadow:none;padding:0}.qtip-content{position:relative;padding:5px 9px;overflow:hidden;text-align:left;word-wrap:break-word}.qtip-titlebar{position:relative;padding:5px 35px 5px 10px;overflow:hidden;border-width:0 0 1px;font-weight:bold}.qtip-titlebar + .qtip-content{border-top-width:0 !important} .qtip-close{position:absolute;right:-9px;top:-9px;z-index:11; cursor:pointer;outline:medium none;border:1px solid transparent}.qtip-titlebar .qtip-close{right:4px;top:50%;margin-top:-9px}* html .qtip-titlebar .qtip-close{top:16px} .qtip-titlebar .ui-icon,.qtip-icon .ui-icon{display:block;text-indent:-1000em;direction:ltr}.qtip-icon,.qtip-icon .ui-icon{-moz-border-radius:3px;-webkit-border-radius:3px;border-radius:3px;text-decoration:none}.qtip-icon .ui-icon{width:18px;height:14px;line-height:14px;text-align:center;text-indent:0;font:normal bold 10px/13px Tahoma,sans-serif;color:inherit;background:transparent none no-repeat -100em -100em} .qtip-focus{} .qtip-hover{} .qtip-default{border:1px solid #F1D031;background-color:#FFFFA3;color:#555}.qtip-default .qtip-titlebar{background-color:#FFEF93}.qtip-default .qtip-icon{border-color:#CCC;background:#F1F1F1;color:#777}.qtip-default .qtip-titlebar .qtip-close{border-color:#AAA;color:#111}.qtip-shadow{-webkit-box-shadow:1px 1px 3px 1px rgba(0,0,0,0.15);-moz-box-shadow:1px 1px 3px 1px rgba(0,0,0,0.15);box-shadow:1px 1px 3px 1px rgba(0,0,0,0.15)} .qtip-rounded,.qtip-tipsy,.qtip-bootstrap{-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px}.qtip-rounded .qtip-titlebar{-moz-border-radius:4px 4px 0 0;-webkit-border-radius:4px 4px 0 0;border-radius:4px 4px 0 0} .qtip-youtube{-moz-border-radius:2px;-webkit-border-radius:2px;border-radius:2px;-webkit-box-shadow:0 0 3px #333;-moz-box-shadow:0 0 3px #333;box-shadow:0 0 3px #333;color:white;border:0 solid transparent;background:#4A4A4A;background-image:-webkit-gradient(linear,left top,left bottom,color-stop(0,#4A4A4A),color-stop(100%,black));background-image:-webkit-linear-gradient(top,#4A4A4A 0,black 100%);background-image:-moz-linear-gradient(top,#4A4A4A 0,black 100%);background-image:-ms-linear-gradient(top,#4A4A4A 0,black 100%);background-image:-o-linear-gradient(top,#4A4A4A 0,black 100%)}.qtip-youtube .qtip-titlebar{background-color:#4A4A4A;background-color:rgba(0,0,0,0)}.qtip-youtube .qtip-content{padding:.75em;font:12px arial,sans-serif;filter:progid:DXImageTransform.Microsoft.Gradient(GradientType=0,StartColorStr=#4a4a4a,EndColorStr=#000000);-ms-filter:"progid:DXImageTransform.Microsoft.Gradient(GradientType=0,StartColorStr=#4a4a4a,EndColorStr=#000000);"}.qtip-youtube .qtip-icon{border-color:#222}.qtip-youtube .qtip-titlebar .ui-state-hover{border-color:#303030} .qtip-jtools{background:#232323;background:rgba(0,0,0,0.7);background-image:-webkit-gradient(linear,left top,left bottom,from(#717171),to(#232323));background-image:-moz-linear-gradient(top,#717171,#232323);background-image:-webkit-linear-gradient(top,#717171,#232323);background-image:-ms-linear-gradient(top,#717171,#232323);background-image:-o-linear-gradient(top,#717171,#232323);border:2px solid #ddd;border:2px solid rgba(241,241,241,1);-moz-border-radius:2px;-webkit-border-radius:2px;border-radius:2px;-webkit-box-shadow:0 0 12px #333;-moz-box-shadow:0 0 12px #333;box-shadow:0 0 12px #333} .qtip-jtools .qtip-titlebar{background-color:transparent;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#717171,endColorstr=#4A4A4A);-ms-filter:"progid:DXImageTransform.Microsoft.gradient(startColorstr=#717171,endColorstr=#4A4A4A)"}.qtip-jtools .qtip-content{filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#4A4A4A,endColorstr=#232323);-ms-filter:"progid:DXImageTransform.Microsoft.gradient(startColorstr=#4A4A4A,endColorstr=#232323)"}.qtip-jtools .qtip-titlebar,.qtip-jtools .qtip-content{background:transparent;color:white;border:0 dashed transparent}.qtip-jtools .qtip-icon{border-color:#555}.qtip-jtools .qtip-titlebar .ui-state-hover{border-color:#333} .qtip-cluetip{-webkit-box-shadow:4px 4px 5px rgba(0,0,0,0.4);-moz-box-shadow:4px 4px 5px rgba(0,0,0,0.4);box-shadow:4px 4px 5px rgba(0,0,0,0.4);background-color:#D9D9C2;color:#111;border:0 dashed transparent}.qtip-cluetip .qtip-titlebar{background-color:#87876A;color:white;border:0 dashed transparent}.qtip-cluetip .qtip-icon{border-color:#808064}.qtip-cluetip .qtip-titlebar .ui-state-hover{border-color:#696952;color:#696952} .qtip-tipsy{background:black;background:rgba(0,0,0,.87);color:white;border:0 solid transparent;font-size:11px;font-family:'Lucida Grande',sans-serif;font-weight:bold;line-height:16px;text-shadow:0 1px black}.qtip-tipsy .qtip-titlebar{padding:6px 35px 0 10px;background-color:transparent}.qtip-tipsy .qtip-content{padding:6px 10px}.qtip-tipsy .qtip-icon{border-color:#222;text-shadow:none}.qtip-tipsy .qtip-titlebar .ui-state-hover{border-color:#303030} .qtip-tipped{border:3px solid #959FA9;-moz-border-radius:3px;-webkit-border-radius:3px;border-radius:3px;background-color:#F9F9F9;color:#454545;font-weight:normal;font-family:serif}.qtip-tipped .qtip-titlebar{border-bottom-width:0;color:white;background:#3A79B8;background-image:-webkit-gradient(linear,left top,left bottom,from(#3A79B8),to(#2E629D));background-image:-webkit-linear-gradient(top,#3A79B8,#2E629D);background-image:-moz-linear-gradient(top,#3A79B8,#2E629D);background-image:-ms-linear-gradient(top,#3A79B8,#2E629D);background-image:-o-linear-gradient(top,#3A79B8,#2E629D);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#3A79B8,endColorstr=#2E629D);-ms-filter:"progid:DXImageTransform.Microsoft.gradient(startColorstr=#3A79B8,endColorstr=#2E629D)"}.qtip-tipped .qtip-icon{border:2px solid #285589;background:#285589}.qtip-tipped .qtip-icon .ui-icon{background-color:#FBFBFB;color:#555} .qtip-bootstrap{ font-size:14px;line-height:20px;color:#333333; padding:1px;background-color:#ffffff;border:1px solid #ccc;border:1px solid rgba(0,0,0,0.2);-webkit-border-radius:6px;-moz-border-radius:6px;border-radius:6px;-webkit-box-shadow:0 5px 10px rgba(0,0,0,0.2);-moz-box-shadow:0 5px 10px rgba(0,0,0,0.2);box-shadow:0 5px 10px rgba(0,0,0,0.2);-webkit-background-clip:padding-box;-moz-background-clip:padding;background-clip:padding-box}.qtip-bootstrap .qtip-titlebar{ padding:8px 14px;margin:0;font-size:14px;font-weight:normal;line-height:18px;background-color:#f7f7f7;border-bottom:1px solid #ebebeb;-webkit-border-radius:5px 5px 0 0;-moz-border-radius:5px 5px 0 0;border-radius:5px 5px 0 0}.qtip-bootstrap .qtip-titlebar .qtip-close{ right:11px;top:45%;border-style:none}.qtip-bootstrap .qtip-content{ padding:9px 14px}.qtip-bootstrap .qtip-icon{ background:transparent}.qtip-bootstrap .qtip-icon .ui-icon{ width:auto;height:auto; float:right;font-size:20px;font-weight:bold;line-height:18px;color:#000000;text-shadow:0 1px 0 #ffffff;opacity:0.2;filter:alpha(opacity=20)}.qtip-bootstrap .qtip-icon .ui-icon:hover{ color:#000000;text-decoration:none;cursor:pointer;opacity:0.4;filter:alpha(opacity=40)} .qtip:not(.ie9haxors) div.qtip-content,.qtip:not(.ie9haxors) div.qtip-titlebar{filter:none;-ms-filter:none}.qtip .qtip-tip{margin:0 auto;overflow:hidden;z-index:10} x:-o-prefocus,.qtip .qtip-tip{visibility:hidden}.qtip .qtip-tip,.qtip .qtip-tip .qtip-vml,.qtip .qtip-tip canvas{position:absolute;color:#123456;background:transparent;border:0 dashed transparent}.qtip .qtip-tip canvas{top:0;left:0}.qtip .qtip-tip .qtip-vml{behavior:url("//wiki.osgeo.org/extensions/SemanticMediaWiki/res/jquery/#default#VML");display:inline-block;visibility:visible}
+/* cache key: osgeo_wiki-osgeo_:resourceloader:filter:minify-css:7:44264607af63fd3392be8a488611a9c8 */
+div.smwtt{color:#000000} span.smwttpersist span.smwttcontent{color:#888888;font-style:italic;font-size:90%} span.smwttinline span.smwttcontent{display:none;speak:none} span.smwtticon{display:none} span.smwttactivepersist{cursor:help;color:#0000C8} span.smwttactiveinline{color:#BB7700;text-decoration:none} img.smwttimg{padding-right:5px;padding-left:4px} .smwttcontent{display:none} .smwtticon{padding:14px 12px 0 0;white-space:nowrap;margin-bottom:-1px} .smwtticon.info{display:inline-block;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAABmJLR0QAQACXAOIX6M4XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1woNCAQvupvvrgAAAgpJREFUKBUFwTtME3EAwOHf3f961+vd9Sh9HEVINUrFhAbRmCgGo9FodCFMLhomJ6MmJsbF1Z2ExMHBUQc3BmOigyERB0ElQHgECRYECrRC26OPa3t+nwQAAI7aO/K458yJeK8qOA74dY/1hbWdxZWJsVUoeAAKAImh2NDdR/duD54cdRLRdMQydB84KJaPzufyyx+6Tr+Zej/2jr1vBUHiin3j/pPnwzcvPMv0OKlb/YlAT4cupR1d0lRNNWwrmUhEB+tmSl7/vTktMiNPhy9dvviyM2FYnZEgpRp8WS3htaC/W2du64iWLAUl1RgoY84qiiJdU03TKFR9vv+tIZQGsiTojqg0WrDtwlHVR7PscCDAVaXoEV3KN+hCELUVVBFgNBOkXZd5NVPhoC6TL0J2v8FhnbiCUBtlX2WzInB1jZiuEQ4KfhVgrR7ErUO+UsMlgCwUT6FRW9YU2TdMXbIsjbglmD+EPQ9iYQFo1Go6Xq3c8hveolze2/hY3M6u2IaGHRI4JpxthyRVHAPCIQXbDFLcyi6WcuufhLs2lXMxsy0tkk51tDkdYVU6ZkosbFXxAwF290vN6amfM0uf374oTI5/lQAAYfddP5e58/BBuivel4qF4k0f/uy7u0sbubn5ifHX7srkLNCUAAAAQtFUW/LUQLI9HHGaPv6/Yj63s/pju1LYPAQA+A8p2cUweh5dZAAAAABJRU5ErkJggg==) no-repeat left bottom;background:url(//wiki.osgeo.org/extensions/SemanticMediaWiki/res/smw/util/../../images/info.png?2015-10-25T17:03:20Z) no-repeat left bottom!ie}.smwtticon.service{display:inline-block;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAABmJLR0QAQACXAOIX6M4XAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH1woNCAQvupvvrgAAAgpJREFUKBUFwTtME3EAwOHf3f961+vd9Sh9HEVINUrFhAbRmCgGo9FodCFMLhomJ6MmJsbF1Z2ExMHBUQc3BmOigyERB0ElQHgECRYECrRC26OPa3t+nwQAAI7aO/K458yJeK8qOA74dY/1hbWdxZWJsVUoeAAKAImh2NDdR/duD54cdRLRdMQydB84KJaPzufyyx+6Tr+Zej/2jr1vBUHiin3j/pPnwzcvPMv0OKlb/YlAT4cupR1d0lRNNWwrmUhEB+tmSl7/vTktMiNPhy9dvviyM2FYnZEgpRp8WS3htaC/W2du64iWLAUl1RgoY84qiiJdU03TKFR9vv+tIZQGsiTojqg0WrDtwlHVR7PscCDAVaXoEV3KN+hCELUVVBFgNBOkXZd5NVPhoC6TL0J2v8FhnbiCUBtlX2WzInB1jZiuEQ4KfhVgrR7ErUO+UsMlgCwUT6FRW9YU2TdMXbIsjbglmD+EPQ9iYQFo1Go6Xq3c8hveolze2/hY3M6u2IaGHRI4JpxthyRVHAPCIQXbDFLcyi6WcuufhLs2lXMxsy0tkk51tDkdYVU6ZkosbFXxAwF290vN6amfM0uf374oTI5/lQAAYfddP5e58/BBuivel4qF4k0f/uy7u0sbubn5ifHX7srkLNCUAAAAQtFUW/LUQLI9HHGaPv6/Yj63s/pju1LYPAQA+A8p2cUweh5dZAAAAABJRU5ErkJggg==) no-repeat left bottom;background:url(//wiki.osgeo.org/extensions/SemanticMediaWiki/res/smw/util/../../images/info.png?2015-10-25T17:03:20Z) no-repeat left bottom!ie}.smwtticon.warning{display:inline-block;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAZ1JREFUKFOVy79rE3EcxvH39+7y8/q9pF4S0xi0mEiaMxV68Yxg8PeiVyhV6iCIQhErHUScFJxcHAX/Azf/AgWXWlsUhyrYioMiqKgoiEgrJTH3cSuldvE9Pg8vkw3Nt6lfHuZ68g9fnv/k2/pPRDDWD098bD1gTO4cdS+NNowp38ZhQ2tgZgQSWo3kDgyPpU/esSuHd4fnK6o1lERtCuIp0tmGO73sHavevf8B8Y7uaDT7pwMXvSmwEkbgNHeFb1eLPH22wNJKnka7enxAG+1/wKxPpq+SuuaeOKSzuSQxq0vGjZML99vj+xJXDmoKa2DOx0znOVUcL7fNrXl8v0OtZhIEv1GFFLUJt3XW43TRJAZgGBal/lbsjN0sZeENIkuEoQUsAq/RQcZpHjEnzpUpA/DqAld/zOjVqOdJFO2RuXlPhuo5efBwUKJou0S9gvx6HO/cG+OmiGD1FdSU3tZNyNdPAFQd4cbFHvUty8jnCOhhl6JYfZBJ4JY1+1IeObc770S6ChClQCvhxaKwEAEISqE+vuf7XkCJCP/TX7cEexPi9whUAAAAAElFTkSuQmCC) no-repeat left bottom;background:url(//wiki.osgeo.org/extensions/SemanticMediaWiki/res/smw/util/../../images/warning.png?2015-10-25T17:03:20Z) no-repeat left bottom!ie}.smwtticon.note{display:inline-block;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAgtJREFUeNokUctqU1EUXefk5iY3D2MrSWOamyq9jYO2BovUR41O1Iykov6Bc6WDDh36A4oKnYkORZBCoA6KI1GrEKhoFWOo1qhJk6Z539c57sTB5gzOWns9NpMA3KCK0s0TsHwiBsW3qPi0OYerbmP89IaVnFvtMn/dmEginU5DITyYLSA4y40embp3MDWVVoNhgKvot1sob699/OqdvM0MY32AVTrZWZhhfnEsk85HEikOxoERnbYwBLxeGNH4jK/wdq1W1Bd7h8fySnlei4WT0ZV4ROWivQt4A+AzV0DrIV8/AtQA9Onjyt7G6spmOJHhb6IXrkbCnqOyuw+YNL0aTRPSpOnVidgE7A70Q/7x+pf315Wgph1TpAVBOcApktUBnN7/t9/AoBT6REAl8f3dBcW07R1pdSGkSvaJIBzIWpHUWkRqDrNAWENFIWJBZafWKZgjbWghDZIRgUK7Hx4PugNzXSK1wZmLVq0CO5ot8kw2Vyg70U+M/Eu7D0lWPLm78GSXKEOD7JlAu4rvTVWwmPGc/frzF63S5kIgv7SeOGCp0usHUmfAhAtW3SIdga2ffZTnl++nZk/dYlJKkDBePXtyOfb56cO4W5rUWH9YQEcEsI2U+9u48WD63KVlY0K3hpeWjgMxqr+snr9zslL5do3t/ThLnYXsUKLIY8YLj22+Y441gOKfAAMAeeDgUIIDAXwAAAAASUVORK5CYII=) no-repeat left bottom;background:url(//wiki.osgeo.org/extensions/SemanticMediaWiki/res/smw/util/../../images/note.png?2015-10-25T17:03:20Z) no-repeat left bottom!ie}
+/* cache key: osgeo_wiki-osgeo_:resourceloader:filter:minify-css:7:42ee500b0e95a0ac034bb75ca9582cdb */
+span.smwbuiltin,span.smwttactiveinline span.smwbuiltin{font-style:italic} div.smwpre{font-family:monospace;padding:1em;border:1px dashed #2f6fab;color:black;background-color:#f9f9f9;line-height:1.1em;margin-bottom:0.5em;margin-top:0.5em;white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;word-break:break-word;margin-right:5px} #smwfootbr{clear:both} span.smwsortkey{display:none} a.sortheader:hover{text-decoration:none} div.smwtimeline{border:1px solid #AAAAAA;background-color:#F9F9F9;  }span.smwtlevent,span.smwtlband,span.smwtlsize,span.smwtlposition{display:none;speak:none}span.smwtlcomment{font-style:italic;padding:5px} div.smwfact{clear:both;background-color:#F9F9F9;padding:5px;margin-top:1em;border:1px solid #AAAAAA;font-size:95%;min-height:23px; }div.smwfact td,div.smwfact tr,div.smwfact table{background-color:#F9F9F9}.smwfactboxhead{font-size:110%;font-weight:bold;float:left;margin-bottom:2px;max-width:90%}table.smwfacttable{border-top:1px dotted #AAAAAA;width:100%;clear:both}td.smwpropname,th.smwpropname,td.smwspecname{text-align:right;vertical-align:top;padding-right:1em}td.smwprops,td.smwspecs{vertical-align:top;width:75%}div.smwhr hr{background-color:#DDDDDD;color:#DDDDDD} span.smwwarning{color:#888888;font-style:italic;font-size:90%} span.smwsearchicon{padding-right:16px;margin-right:2px;color:#888888;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAMAAABhq6zVAAABC1BMVEU+S114jayTpb6Im7eMn7qhsceBlbOYqcKXp8GDl7N2i6rJ0uCYqcJogKB9kq+KnLipt81qgKF8kK9qgKF4jayntstheJpsgqOSo75RaIxWbpCIm7fAy9tlfJ5keptedZdHXX5bcpWBlbOersajssmVp79lfJ5thKN2i6phd5lTa45GW3lPZ4plfJ5le5xRaYxbcpV3jKt2i6pWbpBKYoVOZolSao2HmrZ4jaxTa45JYYRJYYSHmrZedZdFWnhTa45ieZtVbZCzv9Lm6/Ha4Onp7fKks8rb4uvf5e3h5u7X3um2wtXQ2OTAy9vW3efl6fCmtcrJ0uDGz96jssm5xdaruc6uu8+9yNnt8PXd7KeZAAAAQnRSTlMACfbevtlP8sRPTv2lFfRF2Cz1A7jZLdG4HFbm/q8vBAxjxO/syrHaxk0EByM4NyUrutRNBAI6xeJdADjU4QFO3NoNTLabAAAAeElEQVQIHQXBvQ7BUACA0e+7P020EQsDC4NBYrZJ38BTewcmg8XGomnjRso50QlUuSkA1p9TenF2+oRUH7/DzMoChJJH3n2bEpDS0CS7kAVCntd9txhjBFzp7he86h03qqp6kb2qbm8qABy06Y0A8FjHcTkIANCqf7L2G5qa4UzTAAAAAElFTkSuQmCC) center right no-repeat;background:url(//wiki.osgeo.org/extensions/SemanticMediaWiki/res/smw/../images/searchgray_iconsmall.png?2015-10-25T17:03:20Z) center right no-repeat!ie}#bodyContent span.smwsearch a{padding-right:14px;margin-right:2px;color:#888888;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAMAAABhq6zVAAABC1BMVEU+S114jayTpb6Im7eMn7qhsceBlbOYqcKXp8GDl7N2i6rJ0uCYqcJogKB9kq+KnLipt81qgKF8kK9qgKF4jayntstheJpsgqOSo75RaIxWbpCIm7fAy9tlfJ5keptedZdHXX5bcpWBlbOersajssmVp79lfJ5thKN2i6phd5lTa45GW3lPZ4plfJ5le5xRaYxbcpV3jKt2i6pWbpBKYoVOZolSao2HmrZ4jaxTa45JYYRJYYSHmrZedZdFWnhTa45ieZtVbZCzv9Lm6/Ha4Onp7fKks8rb4uvf5e3h5u7X3um2wtXQ2OTAy9vW3efl6fCmtcrJ0uDGz96jssm5xdaruc6uu8+9yNnt8PXd7KeZAAAAQnRSTlMACfbevtlP8sRPTv2lFfRF2Cz1A7jZLdG4HFbm/q8vBAxjxO/syrHaxk0EByM4NyUrutRNBAI6xeJdADjU4QFO3NoNTLabAAAAeElEQVQIHQXBvQ7BUACA0e+7P020EQsDC4NBYrZJ38BTewcmg8XGomnjRso50QlUuSkA1p9TenF2+oRUH7/DzMoChJJH3n2bEpDS0CS7kAVCntd9txhjBFzp7he86h03qqp6kb2qbm8qABy06Y0A8FjHcTkIANCqf7L2G5qa4UzTAAAAAElFTkSuQmCC) center right no-repeat;background:url(//wiki.osgeo.org/extensions/SemanticMediaWiki/res/smw/../images/searchgray_iconsmall.png?2015-10-25T17:03:20Z) center right no-repeat!ie;background-size:10px 10px}#bodyContent span.smwsearch a:hover{text-decoration:none;color:#0000FF;padding-right:16px;margin-right:0px;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAALySURBVDgRlcFraNVlHMDx7+95nv/zP+d/LnObeVtz2uyCrRUVDAIHMbIXltUgKRYR7kWvupjYDSEkgkgoKCiJfGeRzqw0CvYuahBWyrZWuWihuWNrZ+e2c87OZf//U1DB8EXU52P27XuV9takiiVS95ZjV+xdjK3uxbO0sFi15ewnlBYO1pZqP9YbTZQSLmeUOF1eNs+fj219QXdt1i2rfXwPlpxKho3qbpme3B7+/N2wUoyKCJcz9VB2ZFfdcKDtxh7p3hiRiMFSDfKFJjadwF/fd+V8pfhmYXK83ynJgLCSKanU47Et18qmDsc1axXtAlPzEekOS7XhSK3SmNt6uuemJnc2K5VDog0rmaptvWXtmgRBLKJNBL/h8DyhPRBqScGKI31dB2c8c2exsHhIW8tKZtmm/MBGFIohZ2oRQaDYkFYECgLAOjBa0ajVk8VSGc+3rGSa+Us18XQ8bIREgSKIC74G5aAdsEAjjCgXioXSYgVTX0bE8Q+zMD0xVs2V7tKtCepNiJRQB1JAClgjwskvvuXCzOypWn2ZeLiEA5wD58DkZs69fO7UyYGBPQ/FYxoi51D8JRBhNl/i05FRWlpaLtzReZbOxiSzRcNcCXIVMErL2E+fffSYNe61/t33pUxbEgeIwOmpGY6/fQxj4mzrTe/vyUz0zzflLU/CeSOgcRhRiqhZPzx+/OjEr998tXdDd2dfPBHT1flc4eL0Lyc6OzeeXt9WHu52Xw5etTk9UP0+f2szsg87XMEhGP4kWiNEXxczmQfERQSpBIXMHKVcka1XO/QP76/rvr9rsOf2IezIu3f/PpY/8lvRewTIGv4mImjPw/MtnvXwYhbtB9jqefzKxaMfj+R74+u6nrh+1xDN8MiO7Gj+8ELZDhv+lcOJRhtTuZRt7Hn9xQ/do88MPnnz0BAPyns73ziRf8fwH/lWu9mF5acPHvggevalXU+137QN9fn4PYb/wfN0M1cKn3tl/7FNbVt6tk9L39k/AH8KLAsrDQkDAAAAAElFTkSuQmCC) center right no-repeat;background:url(//wiki.osgeo.org/extensions/SemanticMediaWiki/res/smw/../images/search_icon.png?2015-10-25T17:03:20Z) center right no-repeat!ie;background-size:13px 13px}#bodyContent span.swmfactboxheadbrowse a{padding-right:16px;margin-right:2px;color:#000000;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAMAAABhq6zVAAAA5FBMVEUAAADb3uv///+gqcBJYqGTmq24v9KJkamboLBtfqOnrbuSmqyqr7yVnK3o6e3n6OrKzdaWna7O0NWMlKiQl6qWm6yRma3DxczEyM+Olqyeo7J+iaamq7qZoLGMlKrg4eiYobqFjqfBxMyQl6hXbaGXnK+hprmcobPEx9BZbaGkqriIkayjp7d1g6iztsSytsZzf6GcobSaobjq6++Umq5abZ6aoLJre6NqeqJ7hqfg4umvtsp0g6h9iaff4el3hKVld6aUoL6wt8meo7SXnbCUm66Jkqnq6+64usRfcqOxs8Dm5+teFG05AAAAAXRSTlMAQObYZgAAAH9JREFUeF4dymMSRDEABOGZ5HFt27Zt3v8+m833r6saSqDl6aSC0ELhXN7r80egVBYZRmOMJ5LAIV0lsy55LRRRKlNYbs0SrDfQpBCybUgh2EXvH4aOPgZDtRkjtY0nmM7m5HtJrtYbYLvb07Z5PJ2hXMybad4fEtrz5TifL4AfAxMLmJTt7hwAAAAASUVORK5CYII=) center right no-repeat;background:url(//wiki.osgeo.org/extensions/SemanticMediaWiki/res/smw/../images/browse_iconsmall.png?2015-10-25T17:03:20Z) center right no-repeat!ie;background-size:13px 13px}#bodyContent span.swmfactboxheadbrowse a:hover{text-decoration:none;color:#0000FF;padding-right:18px;margin-right:0px;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAA81BMVEUAAADByOQOLn7///8BInfg5O2xuthsf7ODk8CmqbEnQ4slQYoYNYJqea6BhZaSlJ9kbo5fc6xld62/v8Fnea6BhZdbb6lKY6axsrWIjJe/wMQ6UZOCkMVoeq6Gk79BWZpBWJqCkr4uSo8mRI8PLnqio6plcppIXp+LjprFxsgmQYMrRo4nRJI6TX+ytLyKl8xseah7ir9cbqUDJXeJl8xWbLBue6xPZaeYm6V+hqCLl841S34MLXwsSZJVaasSMYBcaYZUZphLYqBsfrFKYaB3iLcwS5EvSpFjeK1neq4zTpE2ToxQaKlSXoIMKW9idKyur7PDoCJEAAAAAXRSTlMAQObYZgAAAJtJREFUGFdlT8USg1AQ292HQ93d3d3dvf//NYWBHhhyS2ZiAAYCnpC7GoU/al5XsjPs9V9fk8tEPn8q+AlH6jGDxxMrwnQmm8N8oVjShXLljXhS1ANio9kCaK+7yIQ9aUeB4XgyhdkcGZOWA44kxnC0hZ3OeXHDcSTyurJwCg6LGXom7WKFmrVXRb1Ztcawu20YyI+nbbrznP3+D9crFuL3dLY6AAAAAElFTkSuQmCC) center right no-repeat;background:url(//wiki.osgeo.org/extensions/SemanticMediaWiki/res/smw/../images/browse_icon.png?2015-10-25T17:03:20Z) center right no-repeat!ie;background-size:15px 15px}#bodyContent span.smwbrowse a{padding-right:14px;margin-right:2px;color:#888888;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAMAAABhq6zVAAAA5FBMVEUAAADb3uv///+gqcBJYqGTmq24v9KJkamboLBtfqOnrbuSmqyqr7yVnK3o6e3n6OrKzdaWna7O0NWMlKiQl6qWm6yRma3DxczEyM+Olqyeo7J+iaamq7qZoLGMlKrg4eiYobqFjqfBxMyQl6hXbaGXnK+hprmcobPEx9BZbaGkqriIkayjp7d1g6iztsSytsZzf6GcobSaobjq6++Umq5abZ6aoLJre6NqeqJ7hqfg4umvtsp0g6h9iaff4el3hKVld6aUoL6wt8meo7SXnbCUm66Jkqnq6+64usRfcqOxs8Dm5+teFG05AAAAAXRSTlMAQObYZgAAAH9JREFUeF4dymMSRDEABOGZ5HFt27Zt3v8+m833r6saSqDl6aSC0ELhXN7r80egVBYZRmOMJ5LAIV0lsy55LRRRKlNYbs0SrDfQpBCybUgh2EXvH4aOPgZDtRkjtY0nmM7m5HtJrtYbYLvb07Z5PJ2hXMybad4fEtrz5TifL4AfAxMLmJTt7hwAAAAASUVORK5CYII=) center right no-repeat;background:url(//wiki.osgeo.org/extensions/SemanticMediaWiki/res/smw/../images/browse_iconsmall.png?2015-10-25T17:03:20Z) center right no-repeat!ie;background-size:10px 10px}#bodyContent span.smwbrowse a:hover{text-decoration:none;color:#0000FF;padding-right:16px;margin-right:0px;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAA81BMVEUAAADByOQOLn7///8BInfg5O2xuthsf7ODk8CmqbEnQ4slQYoYNYJqea6BhZaSlJ9kbo5fc6xld62/v8Fnea6BhZdbb6lKY6axsrWIjJe/wMQ6UZOCkMVoeq6Gk79BWZpBWJqCkr4uSo8mRI8PLnqio6plcppIXp+LjprFxsgmQYMrRo4nRJI6TX+ytLyKl8xseah7ir9cbqUDJXeJl8xWbLBue6xPZaeYm6V+hqCLl841S34MLXwsSZJVaasSMYBcaYZUZphLYqBsfrFKYaB3iLcwS5EvSpFjeK1neq4zTpE2ToxQaKlSXoIMKW9idKyur7PDoCJEAAAAAXRSTlMAQObYZgAAAJtJREFUGFdlT8USg1AQ292HQ93d3d3dvf//NYWBHhhyS2ZiAAYCnpC7GoU/al5XsjPs9V9fk8tEPn8q+AlH6jGDxxMrwnQmm8N8oVjShXLljXhS1ANio9kCaK+7yIQ9aUeB4XgyhdkcGZOWA44kxnC0hZ3OeXHDcSTyurJwCg6LGXom7WKFmrVXRb1Ztcawu20YyI+nbbrznP3+D9crFuL3dLY6AAAAAElFTkSuQmCC) center right no-repeat;background:url(//wiki.osgeo.org/extensions/SemanticMediaWiki/res/smw/../images/browse_icon.png?2015-10-25T17:03:20Z) center right no-repeat!ie;background-size:13px 13px}#bodyContent span.smwmap a{padding-right:20px;color:#888888;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAANkE3LLaAgAAAzBJREFUOBGlwTtsGwUAgOH/zufHOe9zHBzsJM6DhpRUCWmjCiolKgOiS6VKrWBghSUswEAlJjYGRlQECypQhoIEAqlNuwSiJhSqkJAqbR40pnbjR/w6+x72+Xw+itgqMfF98D8JPCn2thwfDZ9/cXro7LOjfSflgLetpBoP1u9llm7/kbqirn+wyX/pmLz4wvsfXV9PplW30XBcu+m4dtNxrUbTNcyGu7r2sH72jc8/hHmJJwUm3pu79OUvVcO03ZJad1PpirtxL+3e2Uy5v24k3b1EwVWrlltW6+75hS++hgseHvPwjyPv9L72yuyNhddPhTXDIpEqki/p6GaDoOzlsKgjCCJOs4VmWBwd7T+2eDerGwdLqxKPdcltb710cnwgmVHJl3R2EjkkSaTVclG6g9hNh/HhPrySh939Am3BAPPHn7l4tfDuZQ+86RVD8scdbb6wLHvJ5quoWo1sQaOq1ckVdAajCqeOD2M3HBwHDgsGubwp7z3MbYn+8Z6oKAjDK+sJvrm+gVeSmBqP4TgumztZDrIauUONRKpMOqfRdFoUSzXUqondap3wBMJzMURhIRDwismMymC/wpn5CSaPRCiWDXp7giCIfHJllWLZJBLqolypc215i2yxui02/T7d5/PYlWqNnk6ZzZ00uw/yyD4fF85MMTsdY2RAQdOaJA+q5EsmZr2BZdv4vP6qx8nphtw/8qrfHwjrhoUousSjvcT6u7h5a4fFn7fJ5U062/y4Lgz1K+wk8rQQ+HN365IEa7aZ6f4+Mn3uaPJRlopmMRZXiD3dgW40qNUddMnCrNsc5FRUrYZhNUhnD0v1/a9uioBkZVcWq6WD0lg8Qme7TKVqIXqgL9TO2GAIBBerYeP3SeylcgRkmcz24lUwyx4gAM1uvZgkEp898fzkiNinyKzcSVBSTSLhDtqDPsJKO0NRhZCisPLTd3fVxLXPgLwHaAESzYqhZrfVztBQPBobaotGFGYmY4S62wkGZXqVbvb2s+6NHy7fytz/9lPgPpAR+JcE9AIDIE6MHzs9N3/65ZmZqeeeQhCkR+m8/vvab3vLSz8u62rqNvAXkAFqfwOkPI+h92xJFAAAAABJRU5ErkJggg==) center right no-repeat;background:url(//wiki.osgeo.org/extensions/SemanticMediaWiki/res/smw/../images/world.png?2015-10-25T17:03:20Z) center right no-repeat!ie}#bodyContent span.smwmap a:hover{padding-right:20px;color:#0000FF;background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAANkE3LLaAgAAAzBJREFUOBGlwTtsGwUAgOH/zufHOe9zHBzsJM6DhpRUCWmjCiolKgOiS6VKrWBghSUswEAlJjYGRlQECypQhoIEAqlNuwSiJhSqkJAqbR40pnbjR/w6+x72+Xw+itgqMfF98D8JPCn2thwfDZ9/cXro7LOjfSflgLetpBoP1u9llm7/kbqirn+wyX/pmLz4wvsfXV9PplW30XBcu+m4dtNxrUbTNcyGu7r2sH72jc8/hHmJJwUm3pu79OUvVcO03ZJad1PpirtxL+3e2Uy5v24k3b1EwVWrlltW6+75hS++hgseHvPwjyPv9L72yuyNhddPhTXDIpEqki/p6GaDoOzlsKgjCCJOs4VmWBwd7T+2eDerGwdLqxKPdcltb710cnwgmVHJl3R2EjkkSaTVclG6g9hNh/HhPrySh939Am3BAPPHn7l4tfDuZQ+86RVD8scdbb6wLHvJ5quoWo1sQaOq1ckVdAajCqeOD2M3HBwHDgsGubwp7z3MbYn+8Z6oKAjDK+sJvrm+gVeSmBqP4TgumztZDrIauUONRKpMOqfRdFoUSzXUqondap3wBMJzMURhIRDwismMymC/wpn5CSaPRCiWDXp7giCIfHJllWLZJBLqolypc215i2yxui02/T7d5/PYlWqNnk6ZzZ00uw/yyD4fF85MMTsdY2RAQdOaJA+q5EsmZr2BZdv4vP6qx8nphtw/8qrfHwjrhoUousSjvcT6u7h5a4fFn7fJ5U062/y4Lgz1K+wk8rQQ+HN365IEa7aZ6f4+Mn3uaPJRlopmMRZXiD3dgW40qNUddMnCrNsc5FRUrYZhNUhnD0v1/a9uioBkZVcWq6WD0lg8Qme7TKVqIXqgL9TO2GAIBBerYeP3SeylcgRkmcz24lUwyx4gAM1uvZgkEp898fzkiNinyKzcSVBSTSLhDtqDPsJKO0NRhZCisPLTd3fVxLXPgLwHaAESzYqhZrfVztBQPBobaotGFGYmY4S62wkGZXqVbvb2s+6NHy7fytz/9lPgPpAR+JcE9AIDIE6MHzs9N3/65ZmZqeeeQhCkR+m8/vvab3vLSz8u62rqNvAXkAFqfwOkPI+h92xJFAAAAABJRU5ErkJggg==) center right no-repeat;background:url(//wiki.osgeo.org/extensions/SemanticMediaWiki/res/smw/../images/world.png?2015-10-25T17:03:20Z) center right no-repeat!ie}.smwrdflink{float:right;font-size:small;padding:2px 0 0 0}.concept-documenation{border-top:1px dotted #AAAAAA}#bodyContent span.rdflink{float:right}#bodyContent span.rdflink a{padding-right:15px;color:#888888;background:url(data:image/gif;base64,R0lGODlhEQASAIQeAIWjzhpTo0h1tvH0+SpeqUh1tWeMwjlqr+Hp89Ld7cLR5rPG4RpSo8PS53aYyDhpr5Wv1FiBvO/z+KS62uDo8ileqWaMwXWXx7LF4KO62pSu1FeAu9Hc7P///wtHnQtHnSH+FUNyZWF0ZWQgd2l0aCBUaGUgR0lNUAAh+QQBAAAfACwAAAAAEQASAAAFU+AnjuQneKhQriclpSvJSC/qxaNX2/hn/6pY6udRAX03k82Y6dROJKjI01H8VknfDoXNbbmkougEBC+DZDES1aHAcChKZ9nzza89HbGefvfSDh8hADs=) center right no-repeat;background:url(//wiki.osgeo.org/extensions/SemanticMediaWiki/res/smw/../images/rdf_flyer.18.gif?2015-10-25T17:03:20Z) center right no-repeat!ie;background-size:10px 10px}#bodyContent span.rdflink a:hover{text-decoration:none;color:#0000FF;padding-right:15px;margin-right:0px;background:url(data:image/gif;base64,R0lGODlhEQASAIQeAIWjzhpTo0h1tvH0+SpeqUh1tWeMwjlqr+Hp89Ld7cLR5rPG4RpSo8PS53aYyDhpr5Wv1FiBvO/z+KS62uDo8ileqWaMwXWXx7LF4KO62pSu1FeAu9Hc7P///wtHnQtHnSH+FUNyZWF0ZWQgd2l0aCBUaGUgR0lNUAAh+QQBAAAfACwAAAAAEQASAAAFU+AnjuQneKhQriclpSvJSC/qxaNX2/hn/6pY6udRAX03k82Y6dROJKjI01H8VknfDoXNbbmkougEBC+DZDES1aHAcChKZ9nzza89HbGefvfSDh8hADs=) center right no-repeat;background:url(//wiki.osgeo.org/extensions/SemanticMediaWiki/res/smw/../images/rdf_flyer.18.gif?2015-10-25T17:03:20Z) center right no-repeat!ie;background-size:10px 10px} table.smwb-factbox{border-left:8px solid #DDDDDD;width:100% }tr.smwb-title{font-size:200%;background-color:#DDDDDD;line-height:1.5}tr.smwb-title td{padding-left:5px;border-bottom:2px solid white}tr.smwb-propvalue{width:100%;background-color:#EEEEEE}tr.smwb-propvalue th{text-align:right;vertical-align:top;font-weight:bold;font-size:120%;background-color:#DDDDDD;padding:0.2em 0.6em;border-bottom:2px solid white;border-top:2px solid white}tr.smwb-propvalue td{padding-left:0.4em;background-color:#EEEEEE;border:0px solid white;border-bottom:2px solid white;border-top:2px solid white;width:90%}tr.smwb-center{background-color:#DDDDDD}span.smwb-value{} table.smwb-ifactbox{border-right:8px solid #DDDDDD;width:100% }tr.smwb-ititle{font-size:200%;background-color:#DDDDDD;line-height:1.5}tr.smwb-ititle td{padding-left:5px;border-bottom:2px solid white}tr.smwb-ipropvalue{width:100%;background-color:#EEEEEE;text-align:right}tr.smwb-ipropvalue th{text-align:left;font-weight:bold;font-size:120%;background-color:#DDDDDD;padding:0.2em 0.6em;border-bottom:3px solid white;border-top:3px solid white}tr.smwb-ipropvalue td{background-color:#EEEEEE;border-bottom:3px solid white;border-top:3px solid white;padding-right:1em;width:90%}span.smwb-ivalue{} .smw-spinner .text{padding-left:2.1em;font-size:12px;vertical-align:middle} .smw-spinner.left.mw-small-spinner{background-position:left;vertical-align:middle;display:inline-block;padding:0px !important} .smw-spinner.center.mw-small-spinner{vertical-align:middle;display:inline-block;padding:0px !important} table.smw-ask-query .smw-ask-query-condition{width:100%}table.smw-ask-query .smw-ask-query-printout{width:100%}.smw-form-horizontalrule{margin-bottom:10px}.smw-form-select,.smw-form-input{padding:1px 1px}.smw-form-checkbox{vertical-align:middle;cursor:pointer}label.smw-form-checkbox{vertical-align:middle;cursor:pointer}.smw-editpage-help{background-color:#F0F0F0;border:1px solid silver; padding:1em 1em 1.5em 1em;margin-bottom:2em}.smw-column-header{font-weight:bold;font-size:1.17em;line-height:1.6;margin-top:0.3em;margin-bottom:0;padding-bottom:0;color:black;overflow:hidden;padding-top:.5em}.smw-column{float:left;word-wrap:break-word}.smw-column-responsive{-webkit-column-width:25em;-moz-column-width:25em;column-width:25em}.smw-column[dir="rtl"]{float:right}.smw-column-responsive[dir="rtl"]{float:right} .smw-callout{padding:10px;margin:0.5em 0;border:1px solid #eee;border-left-width:5px;border-radius:3px}.smw-callout-info{border-left-color:#1b809e}.smw-callout-info .title{color:#1b809e}.smw-callout-warning{border-left-color:#aa6708}.smw-callout-warning .title{color:#aa6708}.smw-callout-error{border-left-color:#ce4844}.smw-callout .title{margin-top:0;margin-bottom:5px;font-size:16px;font-family:inherit;font-weight:500} .smw-subobject-entity{font-style:italic}
+/* cache key: osgeo_wiki-osgeo_:resourceloader:filter:minify-css:7:fe791b282b68fb53bc8b5bfd463c3972 */</style><style>
+.mw-collapsible-toggle{float:right;-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none;user-select:none}  .mw-content-ltr .mw-collapsible-toggle,.mw-content-rtl .mw-content-ltr .mw-collapsible-toggle{float:right} .mw-content-rtl .mw-collapsible-toggle,.mw-content-ltr .mw-content-rtl .mw-collapsible-toggle{float:left}.mw-customtoggle,.mw-collapsible-toggle{cursor:pointer} caption .mw-collapsible-toggle,.mw-content-ltr caption .mw-collapsible-toggle,.mw-content-rtl caption .mw-collapsible-toggle,.mw-content-rtl .mw-content-ltr caption .mw-collapsible-toggle,.mw-content-ltr .mw-content-rtl caption .mw-collapsible-toggle{float:none} li .mw-collapsible-toggle,.mw-content-ltr li .mw-collapsible-toggle,.mw-content-rtl li .mw-collapsible-toggle,.mw-content-rtl .mw-content-ltr li .mw-collapsible-toggle,.mw-content-ltr .mw-content-rtl li .mw-collapsible-toggle{float:none} .mw-collapsible-toggle-li{list-style:none}
+/* cache key: osgeo_wiki-osgeo_:resourceloader:filter:minify-css:7:e1ffd603cbaaa5f1a36e0d13fe843535 */
+.suggestions{overflow:hidden;position:absolute;top:0;left:0;width:0;border:none;z-index:1099;padding:0;margin:-1px 0 0 0}.suggestions-special{position:relative;background-color:white;cursor:pointer;border:solid 1px #aaaaaa;padding:0;margin:0;margin-top:-2px;display:none;padding:0.25em 0.25em;line-height:1.25em}.suggestions-results{background-color:white;cursor:pointer;border:solid 1px #aaaaaa;padding:0;margin:0}.suggestions-result{color:black;margin:0;line-height:1.5em;padding:0.01em 0.25em;text-align:left; overflow:hidden;-o-text-overflow:ellipsis; text-overflow:ellipsis;white-space:nowrap}.suggestions-result-current{background-color:#4C59A6;color:white}.suggestions-special .special-label{color:gray;text-align:left}.suggestions-special .special-query{color:black;font-style:italic;text-align:left}.suggestions-special .special-hover{background-color:silver}.suggestions-result-current .special-label,.suggestions-result-current .special-query{color:white}.highlight{font-weight:bold}
+/* cache key: osgeo_wiki-osgeo_:resourceloader:filter:minify-css:7:f8d0c6895ce3ae14434c16b8fca59432 */
+.postedit-container{margin:0 auto;position:fixed;top:0;height:0;left:50%;z-index:1000;font-size:13px}.postedit-container:hover{cursor:pointer}.postedit{position:relative;top:0.6em;left:-50%;padding:.6em 3.6em .6em 1.1em;line-height:1.5625em;color:#626465;background-color:#f4f4f4;border:1px solid #dcd9d9;text-shadow:0 0.0625em 0 rgba(255,255,255,0.5);border-radius:5px;box-shadow:0 2px 5px 0 #ccc;-webkit-transition:all 0.25s ease-in-out;-moz-transition:all 0.25s ease-in-out;-ms-transition:all 0.25s ease-in-out;-o-transition:all 0.25s ease-in-out;transition:all 0.25s ease-in-out}.skin-monobook .postedit{top:6em !important}.postedit-faded{opacity:0}.postedit-icon{padding-left:41px;  line-height:25px;background-repeat:no-repeat;background-position:8px 50%}.postedit-icon-checkmark{background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAABblBMVEUAAAD///////9PfTf///80aRdTgjn///9Feij///////////9Rfzf///////////9PfjZRgDh1o1xOfTb///////+bwYqLtnj///////9PfTa82K////9WhT6YxIL///9QgDdTgzr////////j7uDl7eLq8efi693k7OH///////9UhjuBr2rp9uRUhjr///9YljVKgir///9WiTlYjT3////9/v57vFlbkT5PjC9dlD/5/fhuq09stUTs9uhxuElctCpfnT1huDFloEZloUZmpENmvDZpvDxpvTxqvjxrvT5rvT9rwTxsqktswD5uwkBvuUdxw0NztFBztU9ztVBzwkp0tlJ1xkd2t1R3uVR4w1F4xk54x014yE15uVZ5v1R5xVB6v1R7yFJ8wVh9xVl9yFR9yVd9ylN+xVh+yFd/x1l/yFeAylmEx1+Ny2uY0Hqe04Wj1Ymv3Ze33qLD47TJ5L3O6cPU7Mrq9eb2+/Q4j37OAAAAQHRSTlMAAQIEBAUFBQwPFB4fJCUoKiosQEhJS01RUlZZXmdydXaChYuSlJSWmJmoq6uur8LExcvM19fg5ejt8fX2+Pr7SljgewAAAKpJREFUGBkFwQNCAwAAAMDLtl3LtrG4rWXbtvX77gAgZ6grFwC0bhwNVgKgdPZx8b0dgLi+s7Wn0VoAqpfOI9+BNADZI7fLrz2pSEwGHZuH+78lSK8ZLkLezF3ooyUG3VPXq2USei9WngeyoG195yBYWDF3E/2pAhl1e9Gr8bGT+bfOFCC2fnvh4X7rcqIAQNNu+HT6sxkAjceTL/2ZAIhv+PorBwBJxfkA//dFHSCBy/UTAAAAAElFTkSuQmCC);background-image:url(/resources/src/mediawiki.action/images/green-checkmark.png?2015-10-16T17:01:40Z)!ie;background-position:left}.postedit-close{position:absolute;padding:0 .8em;right:0;top:0;font-size:1.25em;font-weight:bold;line-height:2.3em;color:black;text-shadow:0 0.0625em 0 white;text-decoration:none;opacity:0.2;filter:alpha(opacity=20)}.postedit-close:hover{color:black;text-decoration:none;opacity:0.4;filter:alpha(opacity=40)}
+/* cache key: osgeo_wiki-osgeo_:resourceloader:filter:minify-css:7:6b623b1d2c3249c4af996e78916d7381 */</style><style>
+.suggestions a.mw-searchSuggest-link,.suggestions a.mw-searchSuggest-link:hover,.suggestions a.mw-searchSuggest-link:active,.suggestions a.mw-searchSuggest-link:focus{color:black;text-decoration:none}.suggestions-result-current a.mw-searchSuggest-link,.suggestions-result-current a.mw-searchSuggest-link:hover,.suggestions-result-current a.mw-searchSuggest-link:active,.suggestions-result-current a.mw-searchSuggest-link:focus{color:white}.suggestions a.mw-searchSuggest-link .special-query{ overflow:hidden;-o-text-overflow:ellipsis; text-overflow:ellipsis;white-space:nowrap}
+/* cache key: osgeo_wiki-osgeo_:resourceloader:filter:minify-css:7:ae3fa4570b5ac0c6cf7b3776c8ae4d6f */</style><meta name="ResourceLoaderDynamicStyles" content="">
+<link rel="stylesheet" href="./Tile Map Service Specification - OSGeo_files/load(2).php">
+<style>a:lang(ar),a:lang(kk-arab),a:lang(mzn),a:lang(ps),a:lang(ur){text-decoration:none}
+/* cache key: osgeo_wiki-osgeo_:resourceloader:filter:minify-css:7:12c34dc54eb496bf8459d205cfe57a99 */</style>
+<script src="./Tile Map Service Specification - OSGeo_files/load(3).php"></script><script src="./Tile Map Service Specification - OSGeo_files/load(4).php"></script>
+<script>if(window.mw){
+mw.config.set({"wgCanonicalNamespace":"","wgCanonicalSpecialPageName":false,"wgNamespaceNumber":0,"wgPageName":"Tile_Map_Service_Specification","wgTitle":"Tile Map Service Specification","wgCurRevisionId":62686,"wgRevisionId":62686,"wgArticleId":2208,"wgIsArticle":true,"wgIsRedirect":false,"wgAction":"view","wgUserName":null,"wgUserGroups":["*"],"wgCategories":["Standards","Tiling"],"wgBreakFrames":false,"wgPageContentLanguage":"en","wgPageContentModel":"wikitext","wgSeparatorTransformTable":["",""],"wgDigitTransformTable":["",""],"wgDefaultDateFormat":"dmy","wgMonthNames":["","January","February","March","April","May","June","July","August","September","October","November","December"],"wgMonthNamesShort":["","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"wgRelevantPageName":"Tile_Map_Service_Specification","wgRelevantArticleId":2208,"wgIsProbablyEditable":false,"wgRestrictionEdit":[],"wgRestrictionMove":[],"egMapsDebugJS":false,"egMapsAvailableServices":["googlemaps3","openlayers","leaflet"],"sfgAutocompleteValues":[],"sfgAutocompleteOnAllChars":false,"sfgFieldProperties":[],"sfgCargoFields":[],"sfgDependentFields":[],"sfgShowOnSelect":[],"sfgScriptPath":"/extensions/SemanticForms","edgValues":null,"sfgEDSettings":null,"wgWikiEditorEnabledModules":{"toolbar":true,"dialogs":true,"hidesig":true,"preview":false,"publish":false}});
+}</script><script>if(window.mw){
+mw.loader.implement("user.options",function($,jQuery){mw.user.options.set({"variant":"en"});});mw.loader.implement("user.tokens",function($,jQuery){mw.user.tokens.set({"editToken":"+\\","patrolToken":"+\\","watchToken":"+\\"});});
+/* cache key: osgeo_wiki-osgeo_:resourceloader:filter:minify-js:7:a5c52c063dc436c1ca7c9f456936a5e9 */
+}</script>
+<script>if(window.mw){
+mw.loader.load(["ext.smw.style","mediawiki.page.startup","mediawiki.legacy.wikibits","mediawiki.legacy.ajax","skins.vector.js"]);
+}</script><script src="./Tile Map Service Specification - OSGeo_files/load(5).php"></script><script src="./Tile Map Service Specification - OSGeo_files/load(6).php"></script>
+<!--[if lt IE 7]><style type="text/css">body{behavior:url("/skins/Vector/csshover.min.htc")}</style><![endif]-->
+</head>
+<body class="mediawiki ltr sitedir-ltr ns-0 ns-subject page-Tile_Map_Service_Specification skin-vector action-view">
+		<div id="mw-page-base" class="noprint"></div>
+		<div id="mw-head-base" class="noprint"></div>
+		<div id="content" class="mw-body" role="main">
+			<a id="top"></a>
+
+						<div class="mw-indicators">
+</div>
+			<h1 id="firstHeading" class="firstHeading" lang="en">Tile Map Service Specification</h1>
+						<div id="bodyContent" class="mw-body-content">
+									<div id="siteSub">From OSGeo</div>
+								<div id="contentSub"></div>
+												<div id="jump-to-nav" class="mw-jump">
+					Jump to:					<a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#mw-head">navigation</a>, 					<a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#p-search">search</a>
+				</div>
+				<div id="mw-content-text" lang="en" dir="ltr" class="mw-content-ltr"><p>This document is the work of a loose community of participants interested in client/server mapping solutions that use multi-resolution image pyramids.  It is meant to be used as a baseline for the implementation of client/server mapping software.  It is not an "official standard" nor is it endorsed by OSGeo as an official project or work product of the Foundation.
+</p><p>This document is version "1.0", and will not be edited further. Changes will be discussed on the <a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification_Change_Requests" title="Tile Map Service Specification Change Requests">Tile Map Service Specification Change Requests</a> page.
+</p><p>Any new revisions will take place in a new working copy.
+</p>
+<div id="toc" class="toc"><div id="toctitle"><h2>Contents</h2><span class="toctoggle">&nbsp;[<a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#" id="togglelink">hide</a>]&nbsp;</span></div>
+<ul>
+<li class="toclevel-1 tocsection-1"><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#Introduction"><span class="tocnumber">1</span> <span class="toctext">Introduction</span></a>
+<ul>
+<li class="toclevel-2 tocsection-2"><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#Document_Scope"><span class="tocnumber">1.1</span> <span class="toctext">Document Scope</span></a></li>
+<li class="toclevel-2 tocsection-3"><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#Document_Form"><span class="tocnumber">1.2</span> <span class="toctext">Document Form</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-4"><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#Specification"><span class="tocnumber">2</span> <span class="toctext">Specification</span></a>
+<ul>
+<li class="toclevel-2 tocsection-5"><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#Root_Resource"><span class="tocnumber">2.1</span> <span class="toctext">Root Resource</span></a></li>
+<li class="toclevel-2 tocsection-6"><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#TileMapService_Resource"><span class="tocnumber">2.2</span> <span class="toctext">TileMapService Resource</span></a></li>
+<li class="toclevel-2 tocsection-7"><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#TileMap_Resource"><span class="tocnumber">2.3</span> <span class="toctext">TileMap Resource</span></a></li>
+<li class="toclevel-2 tocsection-8"><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#Profiles"><span class="tocnumber">2.4</span> <span class="toctext">Profiles</span></a>
+<ul>
+<li class="toclevel-3 tocsection-9"><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#global-geodetic"><span class="tocnumber">2.4.1</span> <span class="toctext">global-geodetic</span></a></li>
+<li class="toclevel-3 tocsection-10"><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#global-mercator"><span class="tocnumber">2.4.2</span> <span class="toctext">global-mercator</span></a></li>
+<li class="toclevel-3 tocsection-11"><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#local"><span class="tocnumber">2.4.3</span> <span class="toctext">local</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-12"><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#Tile_Resources"><span class="tocnumber">2.5</span> <span class="toctext">Tile Resources</span></a></li>
+<li class="toclevel-2 tocsection-13"><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#TileMap_Diagram"><span class="tocnumber">2.6</span> <span class="toctext">TileMap Diagram</span></a></li>
+<li class="toclevel-2 tocsection-14"><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#Error_Handling"><span class="tocnumber">2.7</span> <span class="toctext">Error Handling</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-15"><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#Implementation_Advice"><span class="tocnumber">3</span> <span class="toctext">Implementation Advice</span></a>
+<ul>
+<li class="toclevel-2 tocsection-16"><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#Spatial_Referencing_Systems"><span class="tocnumber">3.1</span> <span class="toctext">Spatial Referencing Systems</span></a></li>
+<li class="toclevel-2 tocsection-17"><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#Maximizing_Cacheability"><span class="tocnumber">3.2</span> <span class="toctext">Maximizing Cacheability</span></a></li>
+<li class="toclevel-2 tocsection-18"><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#Implementing_Cacheability"><span class="tocnumber">3.3</span> <span class="toctext">Implementing Cacheability</span></a></li>
+<li class="toclevel-2 tocsection-19"><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#URLs_That_are_Actually_Scripts"><span class="tocnumber">3.4</span> <span class="toctext">URLs That are Actually Scripts</span></a></li>
+<li class="toclevel-2 tocsection-20"><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#Using_Faces"><span class="tocnumber">3.5</span> <span class="toctext">Using Faces</span></a></li>
+<li class="toclevel-2 tocsection-21"><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#Reference_Implementations"><span class="tocnumber">3.6</span> <span class="toctext">Reference Implementations</span></a>
+<ul>
+<li class="toclevel-3 tocsection-22"><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#Servers"><span class="tocnumber">3.6.1</span> <span class="toctext">Servers</span></a></li>
+<li class="toclevel-3 tocsection-23"><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#Clients"><span class="tocnumber">3.6.2</span> <span class="toctext">Clients</span></a></li>
+</ul>
+</li>
+<li class="toclevel-2 tocsection-24"><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#Returning_Error_Codes"><span class="tocnumber">3.7</span> <span class="toctext">Returning Error Codes</span></a></li>
+</ul>
+</li>
+<li class="toclevel-1 tocsection-25"><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#See_Also"><span class="tocnumber">4</span> <span class="toctext">See Also</span></a></li>
+</ul>
+</div>
+
+<h2><span class="mw-headline" id="Introduction">Introduction</span></h2>
+<h3><span class="mw-headline" id="Document_Scope">Document Scope</span></h3>
+<p>A Tile Map Service (TMS) provides access to cartographic maps of geo-referenced data, not direct access to the data itself.  This document standardizes the way in which map tiles are requested by clients, and the ways that servers describe their holdings.
+</p>
+<h3><span class="mw-headline" id="Document_Form">Document Form</span></h3>
+<p>This document will proceed from a description of general resources provided by the server to particular resources (such as map tiles) providing examples of access URLs and return values at each stage.
+</p>
+<h2><span class="mw-headline" id="Specification">Specification</span></h2>
+<p>The Tiled Web Service provides access to resources, in particular, to rendered cartographic tiles at fixed scales.  Access to these resources is provided via a "REST" interface, starting with a root resource describing available layers, then map resources with a set of scales, then scales holding sets of tiles.  
+</p><p>Each resource contains the descriptive information and links to further resources.  Note that while the URLs used to access resources may appear to have internal meaning (the resource for version 1.0.0 of the service has "1.0.0" in it's URL) such structure is <i>not required</i> of them. 
+</p><p>The only requirement is that the resource be referenced by a URL (http://tms.osgeo.org/1.0.0/ could be http://tms.osgeo.org/onepointzeropointzero or http://tms.osgeo.org/flipper.xml as long as the value appeared in the href of the &lt;TileMapService&gt; element).
+</p><p>The value of an "href" <b>must</b> be an absolute URL (starting with "http://").  For example: href="http://www.service.org/subdirectory/tilemap.xml"
+</p>
+<h3><span class="mw-headline" id="Root_Resource">Root Resource</span></h3>
+<p>The root resource describes the available versions of the &lt;TileMapService&gt; (and possibly other services as well).
+</p><p>Request:
+</p>
+<pre>http://tms.osgeo.org/
+</pre>
+<p>Response (Content-type: text/xml):
+</p>
+<pre>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+ &lt;Services&gt;
+   &lt;TileMapService title="Example Tile Map Service" version="1.0.0" href="http://tms.osgeo.org/1.0.0/" /&gt;
+   &lt;TileMapService title="New Example Tile Map Service" version="1.1.0" href="http://tms.osgeo.org/1.1.0/" /&gt;
+   &lt;FancyFeatureService title="Features!" version="0.9" href="http://ffs.osgeo.org/0.9/" /&gt;
+ &lt;/Services&gt;
+</pre>
+<p>Request:
+</p>
+<pre>http://www.osgeo.org/services/root.xml
+</pre>
+<p>Response:
+</p>
+<pre>&lt;?xml version="1.0" ?&gt;
+ &lt;Services&gt;
+   &lt;TileMapService title="Example Static Tile Map Service" version="1.0.0" href="http://www.osgeo.org/services/tilemapservice.xml" /&gt;
+ &lt;/Services&gt;
+</pre>
+<h3><span class="mw-headline" id="TileMapService_Resource">TileMapService Resource</span></h3>
+<p>The &lt;TileMapService&gt; resource provides description metadata about the service and lists the available &lt;TileMaps&gt;.  
+</p><p>Optional elements in the resource are called out below using the pipe character.  All other elements are mandatory.
+</p><p>Request: 
+</p>
+<pre>http://tms.osgeo.org/1.0.0/
+</pre>
+<p>Response (Content-type: text/xml):
+</p>
+<pre>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+ &lt;TileMapService version="1.0.0" services="http://tms.osgeo.org"&gt;
+   &lt;Title&gt;Example Tile Map Service&lt;/Title&gt;
+   &lt;Abstract&gt;This is a longer description of the example tiling map service.&lt;/Abstract&gt;
+ | &lt;KeywordList&gt;example tile service&lt;/KeywordList&gt;
+ | &lt;ContactInformation&gt;
+ |   &lt;ContactPersonPrimary&gt;
+ |     &lt;ContactPerson&gt;Paul Ramsey&lt;/ContactPerson&gt;
+ |     &lt;ContactOrganization&gt;Refractions Research&lt;/ContactOrganization&gt;
+ |   &lt;/ContactPersonPrimary&gt;
+ |   &lt;ContactPosition&gt;Manager&lt;/ContactPosition&gt;
+ |   &lt;ContactAddress&gt;
+ |     &lt;AddressType&gt;postal&lt;/AddressType&gt;
+ |     &lt;Address&gt;300 - 1207 Douglas Street&lt;/Address&gt;
+ |     &lt;City&gt;Victoria&lt;/City&gt;
+ |     &lt;StateOrProvince&gt;British Columbia&lt;/StateOrProvince&gt;
+ |     &lt;PostCode&gt;V8W2E7&lt;/PostCode&gt;
+ |     &lt;Country&gt;Canada&lt;/Country&gt;
+ |   &lt;/ContactAddress&gt;
+ |   &lt;ContactVoiceTelephone&gt;12503833022&lt;/ContactVoiceTelephone&gt;
+ |   &lt;ContactFacsimileTelephone&gt;12503832140&lt;/ContactFacsimileTelephone&gt;
+ |   &lt;ContactElectronicMailAddress&gt;pramsey@refractions.net&lt;/ContactElectronicMailAddress&gt;
+ | &lt;/ContactInformation&gt;
+   &lt;TileMaps&gt;
+     &lt;TileMap 
+       title="VMAP0 World Map" 
+       srs="EPSG:4326" 
+       profile="global-geodetic" 
+       href="http://tms.osgeo.org/1.0.0/vmap0" /&gt;
+     &lt;TileMap 
+       title="British Columbia Landsat Imagery (2000)" 
+       srs="EPSG:3005" 
+       profile="local" 
+       href="http://tms.osgeo.org/1.0.0/landsat2000" /&gt;
+   &lt;/TileMaps&gt;
+ &lt;/TileMapService&gt;
+</pre>
+<p><br>
+Request: 
+</p>
+<pre>http://www.osgeo.org/services/tilemapservice.xml
+</pre>
+<p>Response (Content-type: text/xml):
+</p>
+<pre>&lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+ &lt;TileMapService version="1.0.0" services="http://www.osgeo.org/services/root.xml"&gt;
+   &lt;Title&gt;Example Static Tile Map Service&lt;/Title&gt;
+   &lt;Abstract&gt;This is a longer description of the static tiling map service.&lt;/Abstract&gt;
+ | &lt;KeywordList&gt;example tile service static&lt;/KeywordList&gt;
+ | &lt;ContactInformation&gt;
+ |   &lt;ContactPersonPrimary&gt;
+ |     &lt;ContactPerson&gt;Paul Ramsey&lt;/ContactPerson&gt;
+ |     &lt;ContactOrganization&gt;Refractions Research&lt;/ContactOrganization&gt;
+ |   &lt;/ContactPersonPrimary&gt;
+ |   &lt;ContactPosition&gt;Manager&lt;/ContactPosition&gt;
+ |   &lt;ContactAddress&gt;
+ |     &lt;AddressType&gt;postal&lt;/AddressType&gt;
+ |     &lt;Address&gt;300 - 1207 Douglas Street&lt;/Address&gt;
+ |     &lt;City&gt;Victoria&lt;/City&gt;
+ |     &lt;StateOrProvince&gt;British Columbia&lt;/StateOrProvince&gt;
+ |     &lt;PostCode&gt;V8W2E7&lt;/PostCode&gt;
+ |     &lt;Country&gt;Canada&lt;/Country&gt;
+ |   &lt;/ContactAddress&gt;
+ |   &lt;ContactVoiceTelephone&gt;12503833022&lt;/ContactVoiceTelephone&gt;
+ |   &lt;ContactFacsimileTelephone&gt;12503832140&lt;/ContactFacsimileTelephone&gt;
+ |   &lt;ContactElectronicMailAddress&gt;pramsey@refractions.net&lt;/ContactElectronicMailAddress&gt;
+ | &lt;/ContactInformation&gt;
+   &lt;TileMaps&gt;
+     &lt;TileMap 
+       title="Vancouver Island Base Map" 
+       srs="EPSG:26910" 
+       profile="none" 
+       href="http://www.osgeo.org/services/basemap.xml" /&gt;
+   &lt;/TileMaps&gt;
+ &lt;/TileMapService&gt;
+</pre>
+<h3><span class="mw-headline" id="TileMap_Resource">TileMap Resource</span></h3>
+<p>A &lt;TileMap&gt; is a (usually) cartographically complete map representation.  Sometimes &lt;TileMap&gt;s are built to be used in conjunction, as a set of stacked layers, but they are generally visually complete on their own.  
+</p><p>&lt;TileMap&gt;s are composed of a set of scale-appropriate cartographic renderings, each divided up into regularly spaced image tiles, called &lt;TileSet&gt;s.  Small-scale (eg, 1:10000000) tile sets may only contain a handful of tiles.  Large-scale tile sets (eg, 1:10000) may contain millions of tiles.
+</p><p>At a particular scale, and in a particular cartographic projection, a &lt;TileMap&gt; is represented by a &lt;TileSet&gt;, a coverage of regularly sized and spaced images that taken together form a complete visual representation of the entire area of coverage of the &lt;TileMap&gt;.
+</p><p>Request: 
+</p>
+<pre>http://tms.osgeo.org/1.0.0/vmap0
+</pre>
+<p>Response (Content-type: text/xml):
+</p>
+<pre> &lt;?xml version="1.0" encoding="UTF-8" ?&gt;  
+  &lt;TileMap version="1.0.0" tilemapservice="http://tms.osgeo.org/1.0.0"&gt;
+   &lt;Title&gt;VMAP0 World Map&lt;/Title&gt;
+   &lt;Abstract&gt;A map of the world built from the NGA VMAP0 vector data set.&lt;/Abstract&gt;
+ | &lt;KeywordList&gt;&lt;/KeywordList&gt;
+ | &lt;Metadata type="TC211" mime-type="text/xml" href="http://www.org" /&gt;
+ | &lt;Attribution&gt;
+ |   &lt;Title&gt;National Geospatial Intelligence Agency&lt;/Title&gt;
+ |   &lt;Logo width="10" height="10" href="http://nga.mil/logo.gif" mime-type="image/gif" /&gt;
+ | &lt;/Attribution&gt;
+ | &lt;WebMapContext href="http://wms.org" /&gt; 
+ | &lt;Face&gt;0&lt;/Face&gt;
+   &lt;SRS&gt;EPSG:4326&lt;/SRS&gt;
+   &lt;BoundingBox minx="-180" miny="-90" maxx="180" maxy="90" /&gt;
+   &lt;Origin x="-180" y="-90" /&gt;  
+   &lt;TileFormat width="256" height="256" mime-type="image/jpeg" extension="jpg" /&gt;
+   &lt;TileSets profile=global-geodetic"&gt;
+     &lt;TileSet href="http://tms.osgeo.org/1.0.0/vmap0/0" units-per-pixel="0.703125" order="0" /&gt;
+     &lt;TileSet href="http://tms.osgeo.org/1.0.0/vmap0/1" units-per-pixel="0.3515625" order="1" /&gt;
+     &lt;TileSet href="http://tms.osgeo.org/1.0.0/vmap0/2" units-per-pixel="0.17578125" order="2" /&gt;
+     &lt;TileSet href="http://tms.osgeo.org/1.0.0/vmap0/3" units-per-pixel="0.08789063" order="3" /&gt;
+   &lt;/TileSets&gt;
+ &lt;/TileMap&gt;
+</pre>
+<p>Request: 
+</p>
+<pre>http://tms.osgeo.org/1.0.0/landsat2000
+</pre>
+<p>Response (Content-type: text/xml):
+</p>
+<pre> &lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+  &lt;TileMap version="1.0.0" tilemapservice="http://tms.osgeo.org/1.0.0"&gt;
+   &lt;Title&gt;British Columbia Landsat Imagery (2000)&lt;/Title&gt;
+   &lt;Abstract&gt;Landsat data collected in the year 2000 over British Columbia.&lt;/Abstract&gt;
+ | &lt;KeywordList&gt;&lt;/KeywordList&gt;
+ | &lt;Metadata type="TC211" mime-type="text/xml" href="http://www.org" /&gt;
+ | &lt;Attribution&gt;
+ |   &lt;Title&gt;Government of British Columbia&lt;/Title&gt;
+ |   &lt;Logo width="10" height="10" href="http://gov.bc.ca/logo.png" mime-type="image/png" /&gt;
+ | &lt;/Attribution&gt;
+ | &lt;WebMapContext href="http://wms.gov.bc.ca" /&gt;
+   &lt;SRS&gt;EPSG:3005&lt;/SRS&gt;
+   &lt;BoundingBox minx="100000" miny="100000" maxx="1800000" maxy="1800000" /&gt;
+   &lt;Origin x="100000" y="100000" /&gt;
+   &lt;TileFormat width="256" height="256" mime-type="image/png" extension="png" /&gt;
+   &lt;TileSets profile="local"&gt;
+     &lt;TileSet href="http://tms.osgeo.org/1.0.0/landsat2000/2048" units-per-pixel="2048" order="0" /&gt;
+     &lt;TileSet href="http://tms.osgeo.org/1.0.0/landsat2000/1024" units-per-pixel="1024" order="1" /&gt;
+     &lt;TileSet href="http://tms.osgeo.org/1.0.0/landsat2000/512" units-per-pixel="512" order="2" /&gt;
+     &lt;TileSet href="http://tms.osgeo.org/1.0.0/landsat2000/256" units-per-pixel="256" order="3" /&gt;
+     &lt;TileSet href="http://tms.osgeo.org/1.0.0/landsat2000/128" units-per-pixel="128" order="4" /&gt;
+     &lt;TileSet href="http://tms.osgeo.org/1.0.0/landsat2000/64" units-per-pixel="64" order="5" /&gt;
+   &lt;/TileSets&gt;
+ &lt;/TileMap&gt;
+</pre>
+<p>Request: 
+</p>
+<pre>http://www.osgeo.org/services/basemap.xml
+</pre>
+<p>Response (Content-type: text/xml):
+</p>
+<pre> &lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+  &lt;TileMap version="1.0.0" tilemapservice="http://www.osgeo.org/services/tilemapservice.xml"&gt;
+   &lt;Title&gt;Vancouver Island Base Map&lt;/Title&gt;
+   &lt;Abstract&gt;A map of the Vancouver Island built from British Columbia planimetric mapping 
+   data and digital elevation hill shading.&lt;/Abstract&gt;
+ | &lt;KeywordList&gt;&lt;/KeywordList&gt;
+ | &lt;Metadata type="TC211" mime-type="text/xml" href="http://www.org" /&gt;
+ | &lt;Attribution&gt;
+ |   &lt;Title&gt;Goverment of British Columbia&lt;/Title&gt;
+ |   &lt;Logo width="10" height="10" href="http://www.gov.bc.ca/logo.gif" mime-type="image/gif" /&gt;
+ | &lt;/Attribution&gt;
+ | &lt;WebMapContext href="http://openmaps.gov.bc.ca" /&gt;
+   &lt;SRS&gt;EPSG:26910&lt;/SRS&gt;
+ | &lt;Face&gt;0&lt;/Face&gt;
+   &lt;BoundingBox minx="500000" miny="4800000" maxx="700000" maxy="5500000" /&gt;
+   &lt;Origin x="500000" y="4800000" /&gt;  
+   &lt;TileFormat width="256" height="256" mime-type="image/png" extension="png" /&gt;
+   &lt;TileSets profile="none"&gt;
+     &lt;TileSet href="http://www.osgeo.org/services/basemap/L1" units-per-pixel="6400" order="0" /&gt;
+     &lt;TileSet href="http://www.osgeo.org/services/basemap/L2" units-per-pixel="1600" order="1" /&gt;
+     &lt;TileSet href="http://www.osgeo.org/services/basemap/L3" units-per-pixel="400" order="2" /&gt;
+     &lt;TileSet href="http://www.osgeo.org/services/basemap/L4" units-per-pixel="100" order="3" /&gt;
+     &lt;TileSet href="http://www.osgeo.org/services/basemap/L5" units-per-pixel="25" order="4" /&gt;
+   &lt;/TileSets&gt;
+ &lt;/TileMap&gt;
+</pre>
+<p>Each &lt;TileMap&gt; supports one &lt;SRS&gt; and one image format. To support more than one SRS or image format, define extra &lt;TileMaps&gt; in your &lt;TileMapService&gt; for each combination you want.
+</p><p>&lt;TileMap&gt;s have both a &lt;BoundingBox&gt; and an &lt;Origin&gt;.  The &lt;BoundingBox&gt; is the extent of the data of interest -- it might be used by a client to set an initial spatial extent.  The &lt;Origin&gt; is the lower-left corner of the 0/0 tile, and the upper right corner of tile -1/-1 (if you choose to configure your service so that negative tiles are required).  The &lt;Origin&gt; may be outside of the visual region of interest (the &lt;BoundingBox&gt;), for reasons of implementation convenience. 
+</p><p>&lt;TileMap&gt;s may participate as a &lt;Face&gt; of a larger complex of &lt;TileMap&gt;s. The OSGPlanet and GeoFusion clients both use separate polar faces in conjuction with equatorial faces (an "earth cube") to create a single world view from multiple tile maps.  See <a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#Using_Faces">#Using Faces</a>. 
+</p><p>&lt;TileMap&gt;s may implement one of three "profile"s, two global profiles in common global projections, or a local profile in an arbitrary projection.  All profiles restrict the service to a fixed set of scales, to allow tilesets from different services to be more easily overlaid.
+</p>
+<h3><span class="mw-headline" id="Profiles">Profiles</span></h3>
+<p>Using this server specification will ensure that clients can easily consume your tiled map data.  However, it will not guarantee that clients can efficiently overlay your data with data from other tile map servers.  In order to maximize the interoperability of your tile map with other tile maps, you must implement the a "profile" for your tile map.
+</p><p>The profile a &lt;TileMap&gt; supports is advertised in the "profile" attribute of the &lt;TileSets&gt; element.  The "profile" will be one of:
+</p>
+<ul><li> none</li>
+<li> global-geodetic</li>
+<li> global-mercator</li>
+<li> local</li></ul>
+<h4><span class="mw-headline" id="global-geodetic">global-geodetic</span></h4>
+<p>If the profile type is set to "global-geodetic", the &lt;TileMap&gt; must meet the following requirements:
+</p>
+<ul><li> Must use &lt;SRS&gt;EPSG:4326&lt;/SRS&gt;</li>
+<li> Must provide &lt;TileSet&gt;s with units-per-pixel meeting the following formula for any integral value of "n" greater than or equal to 0: units-per-pixel = 0.703125 / 2^n
+<ul><li> This scaling allows an initial zoom level that consists of 2 256x256 pixel tiles covering the whole earth, with an &lt;Origin&gt; of (-180,-90).  Other combinations of tile size and &lt;Origin&gt; are also possible at this scale.</li></ul></li></ul>
+<pre>&lt;TileSets profile="global-geodetic"&gt;
+ &lt;TileSet href="http://tms.osgeo.org/1.0.0/vmap0/0" units-per-pixel="0.703125" order="0" /&gt;
+ &lt;TileSet href="http://tms.osgeo.org/1.0.0/vmap0/1" units-per-pixel="0.3515625" order="1" /&gt;
+ &lt;TileSet href="http://tms.osgeo.org/1.0.0/vmap0/2" units-per-pixel="0.17578125" order="2" /&gt;
+ &lt;TileSet href="http://tms.osgeo.org/1.0.0/vmap0/3" units-per-pixel="0.08789063" order="3" /&gt;
+ &lt;/TileSets&gt;
+</pre>
+<h4><span class="mw-headline" id="global-mercator">global-mercator</span></h4>
+<p>If the profile type is set to "global-mercator", the &lt;TileMap&gt; must meet the following requirements:
+</p>
+<ul><li> Must use &lt;SRS&gt;OSGEO:41001&lt;/SRS&gt;</li>
+<li> Must provide &lt;TileSet&gt;s with units-per-pixel meeting the following formula for any integral value of "n" greater than or equal to 0: units-per-pixel = 78271.516 / 2^n
+<ul><li> This scaling allows an initial zoom level that consists of four 256x256 pixel tiles covering the whole earth, with an &lt;Origin&gt; of (-20037508.34, -20037508.34).  Other combinations of tile size and &lt;Origin&gt; are also possible at this scale.</li></ul></li></ul>
+<h4><span class="mw-headline" id="local">local</span></h4>
+<p>Unlike the global profiles, the "local" profile is built from the bottom up, starting with a smallest possible scale of one unit per pixel and compounding upwards from there.  Local profiles can be in any projection, but are at a fixed set of scales.
+</p><p>If the profile type is set to "local", the &lt;TileMap&gt; must meet the following requirements:
+</p>
+<ul><li> May use any coordinate system, and must identify that coordinate system in the &lt;SRS&gt;.</li>
+<li> Must provide &lt;TileSet&gt;s with units-per-pixel meeting the following formula for any integral value of "n" greater than or equal to 0: units-per-pixel = 2^n</li>
+<li> Must provide &lt;TileSet&gt; sub-directories below the &lt;Profile&gt; href value, using the value of "n" appropriate for that &lt;TileSet&gt; as the sub-directory name.</li></ul>
+<pre>&lt;SRS&gt;EPSG:3005&lt;/SRS&gt;
+ &lt;BoundingBox minx="100000" miny="100000" maxx="1800000" maxy="1800000" /&gt;
+ &lt;Origin x="100000" y="100000" /&gt;
+ &lt;TileSets profile="local"&gt;
+   &lt;TileSet href="http://tms.osgeo.org/1.0.0/landsat2000/6" units-per-pixel="2048" order="0" /&gt;
+   &lt;TileSet href="http://tms.osgeo.org/1.0.0/landsat2000/5" units-per-pixel="1024" order="1" /&gt;
+   &lt;TileSet href="http://tms.osgeo.org/1.0.0/landsat2000/4" units-per-pixel="512" order="2" /&gt;
+   &lt;TileSet href="http://tms.osgeo.org/1.0.0/landsat2000/3" units-per-pixel="256" order="3" /&gt;
+   &lt;TileSet href="http://tms.osgeo.org/1.0.0/landsat2000/2" units-per-pixel="128" order="4" /&gt;
+   &lt;TileSet href="http://tms.osgeo.org/1.0.0/landsat2000/1" units-per-pixel="64" order="5" /&gt;
+ &lt;/TileSets&gt;
+</pre>
+<h3><span class="mw-headline" id="Tile_Resources">Tile Resources</span></h3>
+<p>The origin of a &lt;TileMap&gt; is defined in the coordinates of the spatial reference system of the &lt;TileMap&gt;.  The x-coordinate of the tile numbers increases with the x-coordinate of the spatial reference system, and the y-coordinate of the tile numbers also increases with the y-coordinate of the spatial reference system.
+</p><p>Tiles are addressed under the "href" specified in the &lt;TileSet&gt; appending the "x" tile coordinate as a directory name and using the "y" tile coordinate as the file name, with the file "extension" from the &lt;TileFormat&gt;.
+</p><p>Example:
+</p>
+<pre>The tile at the origin of the tile set in the first zoom level of vmap0.
+http://tms.osgeo.org/1.0.0/vmap0/levelzero/0/0.jpg
+</pre>
+<pre>The tile near the middle of the tile set in the third zoom level of vmap0.
+http://tms.osgeo.org/1.0.0/vmap0/leveltwo/3/4.jpg
+</pre>
+<pre>The tile near the middle of the tile set in the fifth zoom level of landsat2000.
+http://tms.osgeo.org/1.0.0/landsat2000/1/8500/8500.png
+</pre>
+<pre>The tile at the origin of the tile set in the first zoom level of basemap.
+http://www.osgeo.org/services/basemap/L1/0/0.png
+</pre>
+<h3><span class="mw-headline" id="TileMap_Diagram">TileMap Diagram</span></h3>
+<p><a href="http://wiki.osgeo.org/wiki/File:Tms.png" class="image"><img alt="Tms.png" src="./Tile Map Service Specification - OSGeo_files/Tms.png" width="541" height="562"></a>
+</p>
+<h3><span class="mw-headline" id="Error_Handling">Error Handling</span></h3>
+<p>When an error occurs in the server, it is important that the client be able easily notice that an error has occurred, and ascertain <i>why</i> the error occured so the user can be notified if necessary.
+</p><p>The tile map server uses HTTP error codes to relay the general reason for an error condition, and an XML payload to communicate the specific reason for the failure in human readable language.
+</p><p>Only HTTP error codes given in this specification should be used to return errors to the client.
+</p>
+<ul><li> The client requests a nonexistent resource URL.  Return HTTP error code 404 (Not Found)</li>
+<li> The server fails in processing a response for a valid resource URL.  Return HTTP error code 500 (Internal Server Error)</li></ul>
+<p>Servers are optionally allowed to return content, even when throwning an error code.  The following is the XML format for a tile map server error message.  If the Content-type of the return on an error is set to text/xml, this format is the required form of the response.
+</p>
+<pre>&lt;?xml version="1.0" ?&gt;
+ &lt;TileMapServerError&gt;
+   &lt;Message&gt;The requested tile is outside the bounding box of the tile map.&lt;/Message&gt;
+ &lt;/TileMapServerError&gt;
+</pre>
+<h2><span class="mw-headline" id="Implementation_Advice">Implementation Advice</span></h2>
+<h3><span class="mw-headline" id="Spatial_Referencing_Systems">Spatial Referencing Systems</span></h3>
+<p>Spatial referencing systems for the tile map service will be defined using the EPSG database as a reference for "well-known" projections, subject to interpretations, given below.  
+</p><p>There are two substantial implementation issues with using the EPSG database as a source of truth for spatial reference systems:
+</p>
+<ul><li> Firstly, the EPSG database has some specific definitions for commonly used geodetic coordinate systems, in particular EPSG:4326 -- geodetic coordinates relative to the WGS84 spheroid.  The EPSG definition for 4326 says that the coordinate order is latitude, longitude and that the units are degrees, minutes, seconds.  However, common usage of EPSG:4326 in web mapping says that the coordinate order is longitude, latitude and the units are decimal degrees.</li>
+<li> Secondly, the EPSG database does not include every commonly used spatial reference system.  There are still many local systems which are not included in the database, though the EPSG does make an effort to include new systems as they are brought to their attention.  However, the EPSG does not catalogue commonly used global and large area systems, presumably as a matter of policy.  For example, no EPSG identifier is provided for a Mercator projection of the world, or an Albers projection of North America.</li></ul>
+<p>The issues will be dealt with by fiat in this specification, matching implementation practice rather than following the database definition:
+</p>
+<ul><li> For all geodetic coordinate systems in the EPSG database, the tile map service specification will treat the coordinate order as longitude, latitude and the units as decimal degrees.</li>
+<li> Spatial reference systems not defined in the EPSG database may be defined in the tile map service specification itself, using an OSGEO authority string.
+<ul><li> <b>OSGEO:41001</b> PROJCS["WGS84 / Simple Mercator", GEOGCS["WGS 84", DATUM["WGS_1984", SPHEROID["WGS_1984",6378137,298.257223563]], PRIMEM["Greenwich",0], UNIT["Decimal_Degree", 0.0174532925199433]], PROJECTION["Mercator_1SP"], PARAMETER["central_meridian",0], PARAMETER["false_easting",0], PARAMETER["false_northing",0], UNIT["Meter",1]]</li>
+<li> <b>OSGEO:42310</b> PROJCS["WGS84+GRS80 / Mercator", GEOGCS["WGS 84", DATUM["WGS_1984", SPHEROID["GRS 1980",6378137,298.257222101], TOWGS84[0,0,0]], PRIMEM["Greenwich",0], UNIT["Decimal_Degree",0.0174532925199433]], PROJECTION["Mercator_1SP"], PARAMETER["central_meridian",0], PARAMETER["false_easting",0], PARAMETER["false_northing",0], UNIT["Meter",1]]</li>
+<li> <b>OSGEO:42101</b> PROJCS["WGS 84 / LCC Canada", GEOGCS["WGS 84", DATUM["WGS_1984", SPHEROID["WGS_1984",6378137,298.257223563]], PRIMEM["Greenwich",0], UNIT["Decimal_Degree",0.0174532925199433]], PROJECTION["Lambert_Conformal_Conic_2SP"], PARAMETER["central_meridian",-95.0], PARAMETER["latitude_of_origin",0], PARAMETER["standard_parallel_1",49.0], PARAMETER["standard_parallel_2",77.0], PARAMETER["false_easting",0.0], PARAMETER["false_northing",-8000000.0], UNIT["Meter",1]]</li>
+<li> <b>OSGEO:42304</b> PROJCS["NAD83 / NRCan LCC Canada", GEOGCS["NAD83", DATUM["North_American_Datum_1983", SPHEROID["GRS_1980",6378137,298.257222101], TOWGS84[0,0,0]], PRIMEM["Greenwich",0], UNIT["Decimal_Degree",0.0174532925199433]], PROJECTION["Lambert_Conformal_Conic_2SP"], PARAMETER["central_meridian",-95.0], PARAMETER["latitude_of_origin",49.0], PARAMETER["standard_parallel_1",49.0], PARAMETER["standard_parallel_2",77.0], PARAMETER["false_easting",0.0], PARAMETER["false_northing",0.0], UNIT["Meter",1]]</li></ul></li></ul>
+<h3><span class="mw-headline" id="Maximizing_Cacheability">Maximizing Cacheability</span></h3>
+<p>Tile maps are usually base maps, and usually represent data that changes on a very slow cycle.  They are also usually large in volume, comprising potentially millions of different tiles.  Given these basic facts, the aggressive use of caching strategies can optimize performance of tile map services.
+</p><p>Caching can happen at multiple layers between the server and the client:
+</p>
+<ul><li> At the client itself, as the user-agent caches results on the local disk.</li>
+<li> In a shared cache at an intermediate ISP, allowing multiple users of the ISP to pull data from the cache.</li>
+<li> In a cache on the server itself, to move load from the tile generator to a simpler caching process.</li></ul>
+<p>In order for caching to occur at any of these layers, the caching mechanisms need to know when a resource is cachable.  
+</p><p>If your tile server is written using a scripting or programming language, you will probably be constructing your HTTP headers yourself, and it is important to include cache control headers when doing so to allow caching to occur.
+</p><p>There are different cache headers for HTTP 1.0 and HTTP 1.1, and because both protocols are in active use, it is important to include both.
+</p><p>For HTTP 1.0, use the "Expires" header.  If you expect your data to change no more than once per week, set your Expires header to one week in the future.  For example, if it is January 1, 2007, and you wanted your tiles to expire no more than one week after they are retreived, you would set your header using this PHP invocation:
+</p>
+<pre>header('Expires: Mon, 8 Jan 2007 14:57:12 GMT');
+</pre>
+<p>Or, to always set the Expires header to one week in the future:
+</p>
+<pre>header('Expires: ' . gmdate('D, j M Y H:i:s T', time() + 7 * 24 * 60 * 60));   // time + 7 days worth of seconds
+</pre>
+<p>For HTTP 1.1, use the "Cache-control" header.  Unlike the older "Expires" header, "Cache-control" does not have a clock reference, just a time period to reatain the data, thereby avoiding the clock sychronization issues of "Expires".
+</p>
+<pre>header('Cache-Control: max-age=86400, must-revalidate');
+header('Cache-Control: ' . 7 * 24 * 60 * 60 );
+</pre>
+<p>Read about HTTP 1.1 cache control headers in the <a rel="nofollow" class="external text" href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.9">W3.org specification</a>.
+</p>
+<h3><span class="mw-headline" id="Implementing_Cacheability">Implementing Cacheability</span></h3>
+<p>You can trust that the somewhere on the internet, someone will respect your cache control headers and your content will be cached, <i>or</i> you can set up your own cache.  If you are running Apache 2.0 adding <a rel="nofollow" class="external text" href="http://httpd.apache.org/docs/2.0/mod/mod_cache.html">mod_cache caching</a> to your tms is laughably easy.  
+</p><p>Just add a mod_cache directive inside your &lt;VirtualHost&gt; definition:
+</p>
+<pre>&lt;IfModule mod_disk_cache.c&gt;
+ CacheRoot /tmp/apache-cache 
+ CacheSize 1024000
+ CacheEnable disk /cgi-bin/tms
+ CacheDirLevels 5
+ CacheDirLength 3
+&lt;/IfModule&gt; 
+</pre>
+<p>This example is for a disk cache, probably what you will use for your TMS, since the data volumes tend to be high.  Note how the CacheEnable directive allows you to very precisely control which content you are going to cache.  In my case, I am only caching the output from my TMS server, nothing else.  If I wanted, I could be even narrower and restrict caching to just one tile map inside my service, or just one tile set.
+</p>
+<h3><span class="mw-headline" id="URLs_That_are_Actually_Scripts">URLs That are Actually Scripts</span></h3>
+<p>For large implementations of the tile map server specification, the data will not be statically pre-built, but will be demand-generated by some kind of backend service.  That means that URLs that appear to be static may actually be dynamic.
+</p><p>The <a rel="nofollow" class="external text" href="http://hoohoo.ncsa.uiuc.edu/cgi/env.html">CGI specification</a> allows this trivially, by passing any path information after the CGI executable in the URL back to the executable in the PATH_INFO environment variable:
+</p>
+<pre>http://tms.osgeo.org/cgi-bin/tms/1.0.0/vmap0
+
+PATH_INFO = 1.0.0/vmap0
+</pre>
+<p>If "tms" is the CGI executable, it can easily extract the remaining path information and use that for processing purposes.
+</p><p>Note that by default some versions of Microsoft IIS do not conform to the CGI specification for this behavior (Apache does).  See the note at <a rel="nofollow" class="external free" href="http://support.microsoft.com/kb/q184320/">http://support.microsoft.com/kb/q184320/</a> for information on how to enable this bahavior in IIS.
+</p><p>Note that it is allowable for URLs to include "."s in the middle of paths, so that executable scripts (like PHP files) can be legally used as TMS servers.
+</p>
+<pre>Here is a root resource:
+http://tms.osgeo.org/tms.php
+</pre>
+<pre>Here is the a tile request on that server:
+http://tms.osgeo.org/tms.php/1.0.0/thetilemap/firstlevel/2/1.jpg
+</pre>
+<p>In general, the simplest way to extract information from the incoming script invocation is to take the incoming PATH_INFO environment variable, strip the "/" character from the start and end of the string, and then split the string into an array using the "/" character.  In this manner, the first element of the array will be the version, the second element will be the tile map, the third will be the level, the fourth will be the tile "x" and the fifth will be the tile "y" (with a .extension).
+</p>
+<h3><span class="mw-headline" id="Using_Faces">Using Faces</span></h3>
+<p>The "face-id" attribute of the &lt;TileMap&gt; referenced in the &lt;TileMapService&gt; is used for some specialized clients.  How that attribute is used by each client is described here.
+</p><p><i>To be filled in by implementation knowledge...</i>
+</p>
+<h3><span class="mw-headline" id="Reference_Implementations">Reference Implementations</span></h3>
+<h4><span class="mw-headline" id="Servers">Servers</span></h4>
+<ul><li> TileCache
+<ul><li> <a rel="nofollow" class="external free" href="http://www.tilecache.org/">http://www.tilecache.org/</a></li></ul></li></ul>
+<h4><span class="mw-headline" id="Clients">Clients</span></h4>
+<ul><li> Worldkit: <a rel="nofollow" class="external free" href="http://worldkit.org/tilemap/">http://worldkit.org/tilemap/</a></li>
+<li> Openlayers: <a rel="nofollow" class="external free" href="http://openlayers.org/">http://openlayers.org/</a></li>
+<li> Cadcorp SIS: <a rel="nofollow" class="external text" href="http://wiki.osgeo.org/images/a/a5/CadcorpTmsClient.png">Screenshot</a></li>
+<li> <a rel="nofollow" class="external text" href="http://www.merkaartor.org/">Merkaartor</a>, an <a rel="nofollow" class="external text" href="http://www.osm.org/">OpenStreetMap</a> editor, can use a TMS server as source for background layers: <i>Note that like Google's map tiles OpenStreetMap counts tile 0,0 from the top-left not the bottom-left.</i></li></ul>
+<h3><span class="mw-headline" id="Returning_Error_Codes">Returning Error Codes</span></h3>
+<p>If your tile map server is a static set of files, you will find that your web server sets the appropriate error codes automatically when people ask for resources that do not exist, or the server suffers a failure.  
+</p><p>However, if your tile map server is dynamic, you will have to set the HTTP status codes yourself, otherwise the HTTP server will assign a code of 200 (OK) for your error message XML document, which would be wrong.  In PHP, an error return function might look like this:
+</p>
+<pre>header("HTTP/1.0 404 Not Found");
+header("Content-type: text/xml");
+print "&lt;?xml version='1.0'&nbsp;?&gt;";
+print "&lt;TileMapServerErrror&gt;";
+print "&lt;Message&gt;You requested a map tile [ $path_info ] that does not exist.&lt;/Message&gt;";
+print "&lt;/TileMapServerError&gt;";
+</pre>
+<p>Note that in addition to setting the error code the Content-type was also correctly set.  Also note that cache headers were <i>not</i> set, since errors are not a good thing to cache.
+</p>
+<h2><span class="mw-headline" id="See_Also">See Also</span></h2>
+<ul><li> <a rel="nofollow" class="external text" href="http://www.peej.co.uk/articles/rest.html">What is REST</a></li>
+<li> <a rel="nofollow" class="external text" href="http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames">OpenStreetMap's "Slippy tiles"</a>. <i>Note that like Google map tiles, their grid counting starts from the top-left not the bottom-left.</i></li></ul>
+
+<!-- 
+NewPP limit report
+CPU time usage: 0.096 seconds
+Real time usage: 0.097 seconds
+Preprocessor visited node count: 369/1000000
+Preprocessor generated node count: 704/1000000
+Post‐expand include size: 0/2097152 bytes
+Template argument size: 0/2097152 bytes
+Highest expansion depth: 2/40
+Expensive parser function count: 0/100
+-->
+
+<!-- 
+Transclusion expansion time report (%,ms,calls,template)
+100.00%    0.000      1 - -total
+-->
+
+<!-- Saved in parser cache with key osgeo_wiki-osgeo_:pcache:idhash:2208-0!*!0!!en!5!* and timestamp 20181024022815 and revision id 62686
+ -->
+</div>									<div class="printfooter">
+						Retrieved from "<a dir="ltr" href="http://wiki.osgeo.org/index.php?title=Tile_Map_Service_Specification&amp;oldid=62686">http://wiki.osgeo.org/index.php?title=Tile_Map_Service_Specification&amp;oldid=62686</a>"					</div>
+													<div id="catlinks" class="catlinks"><div id="mw-normal-catlinks" class="mw-normal-catlinks"><a href="http://wiki.osgeo.org/wiki/Special:Categories" title="Special:Categories">Categories</a>: <ul><li><a href="http://wiki.osgeo.org/wiki/Category:Standards" title="Category:Standards">Standards</a></li><li><a href="http://wiki.osgeo.org/wiki/Category:Tiling" title="Category:Tiling">Tiling</a></li></ul></div></div>												<div class="visualClear"></div>
+							</div>
+		</div>
+		<div id="mw-navigation">
+			<h2>Navigation menu</h2>
+
+			<div id="mw-head">
+									<div id="p-personal" role="navigation" class="" aria-labelledby="p-personal-label">
+						<h3 id="p-personal-label">Personal tools</h3>
+						<ul>
+							<li id="pt-login"><a href="http://wiki.osgeo.org/index.php?title=Special:UserLogin&amp;returnto=Tile+Map+Service+Specification" title="You are encouraged to log in; however, it is not mandatory [alt-shift-o]" accesskey="o">Log in</a></li><li id="pt-createaccount"><a href="http://wiki.osgeo.org/wiki/Special:RequestAccount" title="You are encouraged to create an account and log in; however, it is not mandatory">Request account</a></li>						</ul>
+					</div>
+									<div id="left-navigation">
+										<div id="p-namespaces" role="navigation" class="vectorTabs" aria-labelledby="p-namespaces-label">
+						<h3 id="p-namespaces-label">Namespaces</h3>
+						<ul>
+															<li id="ca-nstab-main" class="selected"><span><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification" title="View the content page [alt-shift-c]" accesskey="c">Page</a></span></li>
+															<li id="ca-talk"><span><a href="http://wiki.osgeo.org/wiki/Talk:Tile_Map_Service_Specification" title="Discussion about the content page [alt-shift-t]" accesskey="t">Discussion</a></span></li>
+													</ul>
+					</div>
+										<div id="p-variants" role="navigation" class="vectorMenu emptyPortlet" aria-labelledby="p-variants-label">
+												<h3 id="p-variants-label" tabindex="0"><span>Variants</span><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#" tabindex="-1"></a></h3>
+
+						<div class="menu">
+							<ul>
+															</ul>
+						</div>
+					</div>
+									</div>
+				<div id="right-navigation">
+										<div id="p-views" role="navigation" class="vectorTabs" aria-labelledby="p-views-label">
+						<h3 id="p-views-label">Views</h3>
+						<ul>
+															<li id="ca-view" class="selected"><span><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification">Read</a></span></li>
+															<li id="ca-viewsource"><span><a href="http://wiki.osgeo.org/index.php?title=Tile_Map_Service_Specification&amp;action=edit" title="This page is protected.
+You can view its source [alt-shift-e]" accesskey="e">View source</a></span></li>
+															<li id="ca-history" class="collapsible"><span><a href="http://wiki.osgeo.org/index.php?title=Tile_Map_Service_Specification&amp;action=history" title="Past revisions of this page [alt-shift-h]" accesskey="h">View history</a></span></li>
+													</ul>
+					</div>
+										<div id="p-cactions" role="navigation" class="vectorMenu emptyPortlet" aria-labelledby="p-cactions-label" style="">
+						<h3 id="p-cactions-label" tabindex="0"><span>More</span><a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification#" tabindex="-1"></a></h3>
+
+						<div class="menu">
+							<ul>
+															</ul>
+						</div>
+					</div>
+										<div id="p-search" role="search">
+						<h3>
+							<label for="searchInput">Search</label>
+						</h3>
+
+						<form action="http://wiki.osgeo.org/index.php" id="searchform">
+														<div id="simpleSearch">
+															<input type="search" name="search" placeholder="Search" title="Search OSGeo [alt-shift-f]" accesskey="f" id="searchInput" tabindex="1" autocomplete="off"><input type="hidden" value="Special:Search" name="title"><input type="submit" name="go" value="Go" title="Go to a page with this exact name if exists" id="searchButton" class="searchButton">								</div>
+						</form>
+					</div>
+									</div>
+			</div>
+			<div id="mw-panel">
+				<div id="p-logo" role="banner"><a class="mw-wiki-logo" href="http://wiki.osgeo.org/wiki/Main_Page" title="Visit the main page"></a></div>
+						<div class="portal" role="navigation" id="p-navigation" aria-labelledby="p-navigation-label">
+			<h3 id="p-navigation-label">Navigation</h3>
+
+			<div class="body">
+									<ul>
+													<li id="n-mainpage-description"><a href="http://wiki.osgeo.org/wiki/Main_Page" title="Visit the main page [alt-shift-z]" accesskey="z">Main page</a></li>
+													<li id="n-currentevents"><a href="http://wiki.osgeo.org/wiki/OSGeo:Current_events" title="Find background information on current events">Current events</a></li>
+													<li id="n-recentchanges"><a href="http://wiki.osgeo.org/wiki/Special:RecentChanges" title="A list of recent changes in the wiki [alt-shift-r]" accesskey="r">Recent changes</a></li>
+													<li id="n-randompage"><a href="http://wiki.osgeo.org/wiki/Special:Random" title="Load a random page [alt-shift-x]" accesskey="x">Random page</a></li>
+													<li id="n-help"><a href="https://www.mediawiki.org/wiki/Special:MyLanguage/Help:Contents" title="The place to find out">Help</a></li>
+											</ul>
+							</div>
+		</div>
+			<div class="portal" role="navigation" id="p-tb" aria-labelledby="p-tb-label">
+			<h3 id="p-tb-label">Tools</h3>
+
+			<div class="body">
+									<ul>
+													<li id="t-whatlinkshere"><a href="http://wiki.osgeo.org/wiki/Special:WhatLinksHere/Tile_Map_Service_Specification" title="A list of all wiki pages that link here [alt-shift-j]" accesskey="j">What links here</a></li>
+													<li id="t-recentchangeslinked"><a href="http://wiki.osgeo.org/wiki/Special:RecentChangesLinked/Tile_Map_Service_Specification" title="Recent changes in pages linked from this page [alt-shift-k]" accesskey="k">Related changes</a></li>
+													<li id="t-specialpages"><a href="http://wiki.osgeo.org/wiki/Special:SpecialPages" title="A list of all special pages [alt-shift-q]" accesskey="q">Special pages</a></li>
+													<li id="t-print"><a href="http://wiki.osgeo.org/index.php?title=Tile_Map_Service_Specification&amp;printable=yes" rel="alternate" title="Printable version of this page [alt-shift-p]" accesskey="p">Printable version</a></li>
+													<li id="t-permalink"><a href="http://wiki.osgeo.org/index.php?title=Tile_Map_Service_Specification&amp;oldid=62686" title="Permanent link to this revision of the page">Permanent link</a></li>
+													<li id="t-info"><a href="http://wiki.osgeo.org/index.php?title=Tile_Map_Service_Specification&amp;action=info" title="More information about this page">Page information</a></li>
+													<li id="t-smwbrowselink"><a href="http://wiki.osgeo.org/wiki/Special:Browse/Tile_Map_Service_Specification" rel="smw-browse">Browse properties</a></li>
+											</ul>
+							</div>
+		</div>
+				</div>
+		</div>
+		<div id="footer" role="contentinfo">
+							<ul id="footer-info">
+											<li id="footer-info-lastmod"> This page was last modified on 16 May 2012, at 06:08.</li>
+											<li id="footer-info-copyright">Content is available under the Creative Commons Attribution-ShareAlike License.</li>
+									</ul>
+							<ul id="footer-places">
+											<li id="footer-places-privacy"><a href="http://wiki.osgeo.org/wiki/OSGeo:Privacy_policy" title="OSGeo:Privacy policy">Privacy policy</a></li>
+											<li id="footer-places-about"><a href="http://wiki.osgeo.org/wiki/OSGeo:About" title="OSGeo:About">About OSGeo</a></li>
+											<li id="footer-places-disclaimer"><a href="http://wiki.osgeo.org/wiki/OSGeo:General_disclaimer" title="OSGeo:General disclaimer">Disclaimers</a></li>
+									</ul>
+										<ul id="footer-icons" class="noprint">
+											<li id="footer-copyrightico">
+															<a href="http://creativecommons.org/licenses/by-sa/2.5/legalcode"><img src="./Tile Map Service Specification - OSGeo_files/somerights20.png" alt="Creative Commons Legal Code" width="88" height="31"></a>
+													</li>
+											<li id="footer-poweredbyico">
+															<a href="http://www.mediawiki.org/"><img src="./Tile Map Service Specification - OSGeo_files/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki" srcset="/resources/assets/poweredby_mediawiki_132x47.png 1.5x, /resources/assets/poweredby_mediawiki_176x62.png 2x" width="88" height="31"></a>
+															<a href="https://www.semantic-mediawiki.org/wiki/Semantic_MediaWiki"><img src="./Tile Map Service Specification - OSGeo_files/smw_button.png" alt="Powered by Semantic MediaWiki" width="88" height="31"></a>
+													</li>
+									</ul>
+						<div style="clear:both"></div>
+		</div>
+		<script>if(window.jQuery)jQuery.ready();</script><script>if(window.mw){
+mw.loader.state({"site":"loading","user":"ready","user.groups":"ready"});
+}</script>
+<script>if(window.mw){
+mw.loader.load(["ext.smw.tooltips","mediawiki.toc","mediawiki.action.view.postEdit","mediawiki.user","mediawiki.hidpi","mediawiki.page.ready","mediawiki.searchSuggest"],null,true);
+}</script>
+<script>if(window.mw){
+document.write("\u003Cscript src=\"//wiki.osgeo.org/load.php?debug=false\u0026amp;lang=en\u0026amp;modules=site\u0026amp;only=scripts\u0026amp;skin=vector\u0026amp;*\"\u003E\u003C/script\u003E");
+}</script><script src="./Tile Map Service Specification - OSGeo_files/load(7).php"></script>
+<script>if(window.mw){
+mw.config.set({"wgBackendResponseTime":306});
+}</script>
+	
+
+<div class="suggestions" style="display: none; font-size: 13px;"><div class="suggestions-results"></div><div class="suggestions-special"></div></div></body></html>
