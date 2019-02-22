@@ -5,3 +5,6 @@ Cesium.PolylinePipeline.generateArc 获得两个点之间的所有点的世界�
 之后使用var promise = Cesium.sampleTerrainMostDetailed(terrainProvider, positions);
 Cesium.when(promise, function(updatedPositions) {}
 获取其高程信息
+
+
+http://blog.sina.com.cn/yanzhe2sasa
