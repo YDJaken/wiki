@@ -61,5 +61,5 @@ lsof -i:**
 
 ### scp 跨主机复制
 ```
-scp /home/dy/Desktop/graphhopperRouting.war root@192.168.1.195:/usr/local/apache-tomcat-8.5.34/webapps/
+scp -r "本地路径" root@192.168.1.195:"远端路径"
 ```
