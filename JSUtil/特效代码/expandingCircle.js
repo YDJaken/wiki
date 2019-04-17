@@ -1,3 +1,5 @@
+//http://blog.sina.com.cn/s/blog_15e866bbe0102yjaj.html
+
 function AddCircleScanPostStage(viewer, cartographicCenter, maxRadius, scanColor, duration) {
 
     var ScanSegmentShader =

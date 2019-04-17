@@ -556,3 +556,66 @@ genDType frexp(	genDType x,
          out exp 放置返回的指数
 
 **介绍**:frexp 相当于 x = significand*2^exponent significand取值[0.5,1.0);如果x =0 则significand和exponent都为0 如果x=NaN 则significand和exponent都为undefined
+
+
+
+```
+// 通过视点位置和鼠标坐标获取射线
+float[] mvp = new float[16]; // 原投影转换矩阵
+float mouse_x, mouse_y; // 鼠标坐标
+
+float[] mvp_inverse = new float[16];
+Matrix.invertM(mvp_inverse, 0, mvp, 0);
+// 反转投影转换矩阵
+
+float nearX = mvp_inverse[0 * 4 + 0] * mouse_x +
+              mvp_inverse[1 * 4 + 0] * mouse_y +
+              mvp_inverse[2 * 4 + 0] * -1 +
+              mvp_inverse[3 * 4 + 0];
+float nearY = mvp_inverse[0 * 4 + 1] * mouse_x +
+              mvp_inverse[1 * 4 + 1] * mouse_y +
+              mvp_inverse[2 * 4 + 1] * -1 +
+              mvp_inverse[3 * 4 + 1];
+float nearZ = mvp_inverse[0 * 4 + 2] * mouse_x +
+              mvp_inverse[1 * 4 + 2] * mouse_y +
+              mvp_inverse[2 * 4 + 2] * -1 +
+              mvp_inverse[3 * 4 + 2];
+float nearW = mvp_inverse[0 * 4 + 3] * mouse_x +
+              mvp_inverse[1 * 4 + 3] * mouse_y +
+              mvp_inverse[2 * 4 + 3] * -1 +
+              mvp_inverse[3 * 4 + 3];
+// 更新近平面的构成点
+
+nearX /= nearW;
+nearY /= nearW;
+nearZ /= nearW;
+// 获取远平面的构成点
+
+float farX = mvp_inverse[0 * 4 + 0] * mouse_x +
+             mvp_inverse[1 * 4 + 0] * mouse_y +
+             mvp_inverse[2 * 4 + 0] * +1 +
+             mvp_inverse[3 * 4 + 0];
+float farY = mvp_inverse[0 * 4 + 1] * mouse_x +
+             mvp_inverse[1 * 4 + 1] * mouse_y +
+             mvp_inverse[2 * 4 + 1] * +1 +
+             mvp_inverse[3 * 4 + 1];
+float farZ = mvp_inverse[0 * 4 + 2] * mouse_x +
+             mvp_inverse[1 * 4 + 2] * mouse_y +
+             mvp_inverse[2 * 4 + 2] * +1 +
+             mvp_inverse[3 * 4 + 2];
+float farW = mvp_inverse[0 * 4 + 3] * mouse_x +
+             mvp_inverse[1 * 4 + 3] * mouse_y +
+             mvp_inverse[2 * 4 + 3] * +1 +
+             mvp_inverse[3 * 4 + 3];
+// 更新远平面的构成点
+
+farX /= farW;
+farY /= farW;
+farZ /= farW;
+
+float rayX = farX - nearX, rayY = farY - nearY, rayZ = farZ - nearZ;
+// 射线方向
+
+float orgX = nearX, orgY = nearY, orgZ = nearZ;
+// 射线原点
+```
