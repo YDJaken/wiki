@@ -15,7 +15,7 @@ Return the geometry as a GeoJSON element. (Cf GeoJSON specifications 1.0). 2D an
 
 The gj_version parameter is the major version of the GeoJSON spec. If specified, must be 1. This represents the spec version of GeoJSON.
 
-The third argument may be used to reduce the maximum number	of decimal places used in output (defaults to 15). If you are using EPSG:4326 and are outputting the geometry only for display, maxdecimaldigits=6 can be a good choice for many maps.
+The third argument may be used to reduce the maximum number of decimal places used in output (defaults to 15). If you are using EPSG:4326 and are outputting the geometry only for display, maxdecimaldigits=6 can be a good choice for many maps.
 
 The last options argument could be used to add BBOX or CRS in GeoJSON output:
 
