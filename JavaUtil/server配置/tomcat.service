@@ -1,0 +1,25 @@
+[Unit]
+Description=Apache Tomcat 9 Web Application Container
+After=network.target
+
+[Service]
+Type=forking
+PIDFile=/opt/apache-tomcat-9.0.21/tomcat.pid
+Environment=CATALINA_PID=/opt/apache-tomcat-9.0.21/tomcat.pid
+Environment=JAVA_HOME=/usr/java/jdk1.8.0_181
+Environment=CATALINA_HOME=/opt/apache-tomcat-9.0.21
+Environment=CATALINA_BASE=/opt/apache-tomcat-9.0.21
+Environment='JAVA_OPTS=-server -Xms512M -Xmx2G -XX:+AggressiveOpts -XX:+UseBiasedLocking -XX:+DisableExplicitGC -XX:+UseParallelGC -XX:+UseFastAccessorMethods'
+
+ExecStart=/opt/apache-tomcat-9.0.21/bin/startup.sh
+
+ExecStop=/opt/apache-tomcat-9.0.21/bin/shutdown.sh
+
+User=tomcat
+Group=tomcat
+UMask=0007
+RestartSec=20
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
