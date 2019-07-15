@@ -1,0 +1,5 @@
+JAVA_OPTS="-server -Xms1000m -Xmx2g -Xmn768m -Xss512k -XX:NewSize=128m -XX:MaxNewSize=256m -XX:+DisableExplicitGC -XX:+UseParallelGC -XX:ParallelGCThreads=14 -XX:+UseParallelOldGC -XX:+UseAdaptiveSizePolicy -XX:+UseFastAccessorMethods -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=512m -XX:MaxDirectMemorySize=128M -XX:CompressedClassSpaceSize=512M -Djava.awt.headless=true"
+
+# 链接
+https://blog.csdn.net/kthq/article/details/8618052
+https://www.cnblogs.com/milton/p/6134251.html

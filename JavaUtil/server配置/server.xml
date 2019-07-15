@@ -148,7 +148,7 @@
              Documentation at: /docs/config/valve.html
              Note: The pattern used is equivalent to using pattern="common" -->
         <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs" pattern="%h %l %u %t &quot;%r&quot; %s %b" prefix="localhost_access_log" suffix=".txt"/>
-        <Context cachingAllowed="false" docBase="/data/DownLoad/Terrain/normal" path="/normal" reloadable="false"/>
+        <Context docBase="/data/DownLoad/Terrain/normal" path="/normal" reloadable="false"/>
       <Context docBase="NewYorkDonwloader" path="/NewYorkDonwloader" reloadable="true" source="org.eclipse.jst.jee.server:NewYorkDonwloader"/><Context docBase="TerrainDownloader" path="/TerrainDownloader" reloadable="true" source="org.eclipse.jst.jee.server:TerrainDownloader"/><Context docBase="MapDownloader" path="/MapDownloader" reloadable="true" source="org.eclipse.jst.jee.server:MapDownloader"/><Context docBase="graphhopperRouting" path="/graphhopperRouting" reloadable="true" source="org.eclipse.jst.jee.server:graphhopperRouting"/></Host>
     </Engine>
   </Service>
