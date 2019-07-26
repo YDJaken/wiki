@@ -4,12 +4,12 @@ After=network.target
 
 [Service]
 Type=forking
-PIDFile=/opt/apache-tomcat-9.0.21/tomcat.pid
-EnvironmentFile=/opt/apache-tomcat-9.0.21/tomcat.properties
+PIDFile=/data2/apache-tomcat-9.0.21/tomcat.pid
+EnvironmentFile=/data2/apache-tomcat-9.0.21/tomcat.properties
 
-ExecStart=/opt/apache-tomcat-9.0.21/bin/startup.sh
+ExecStart=/data2/apache-tomcat-9.0.21/bin/startup.sh
 
-ExecStop=/opt/apache-tomcat-9.0.21/bin/shutdown.sh
+ExecStop=/data2/apache-tomcat-9.0.21/bin/shutdown.sh
 
 User=tomcat
 Group=tomcat
