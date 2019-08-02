@@ -1,0 +1,14 @@
+# 查看程序状态
+top -u user
+
+# 查询内存
+free -h
+
+# 查询程序内存 映射
+pmap pid
+
+# 查询java程序内存映射
+jmap pid
+
+# 解决glibc的Arena内存分配问题 建议替换为tcmalloc  链接:https://www.sohu.com/a/200462136_505827
+export MALLOC_ARENA_MAX = 1

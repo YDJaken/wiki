@@ -1,0 +1,12 @@
+#centos7启动防火墙
+systemctl start firewalld.service
+#centos7停止防火墙/关闭防火墙
+systemctl stop firewalld.service
+#centos7重启防火墙
+systemctl restart firewalld.service
+
+#说明:
+#–zone #作用域
+#–add-port=80/tcp #添加端口，格式为：端口/通讯协议
+#–permanent 永久生效，没有此参数重启后失效
+firewall-cmd --zone=public --add-port=80/tcp --permanent

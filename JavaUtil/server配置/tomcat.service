@@ -4,19 +4,12 @@ After=network.target
 
 [Service]
 Type=forking
-PIDFile=/opt/apache-tomcat-9.0.21/tomcat.pid
-Environment=CATALINA_PID=/opt/apache-tomcat-9.0.21/tomcat.pid
-Environment=JAVA_HOME=/usr/java/jdk1.8.0_181
-Environment=CATALINA_HOME=/opt/apache-tomcat-9.0.21
-Environment=CATALINA_BASE=/opt/apache-tomcat-9.0.21
-Environment=MALLOC_ARENA_MAX=1
-Environment='CATALINA_OPTS=-server -Xms1000m -Xmx1g -XX:MaxNewSize=256m -XX:+UseBiasedLocking -XX:+DisableExplicitGC -XX:+UseParallelGC -XX:+UseFastAccessorMethods -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=512m'
+PIDFile=/data2/apache-tomcat-9.0.21/tomcat.pid
+EnvironmentFile=/data2/apache-tomcat-9.0.21/tomcat.properties
 
-Environment='JAVA_OPTS= -Djava.awt.headless=true'
+ExecStart=/data2/apache-tomcat-9.0.21/bin/startup.sh
 
-ExecStart=/opt/apache-tomcat-9.0.21/bin/startup.sh
-
-ExecStop=/opt/apache-tomcat-9.0.21/bin/shutdown.sh
+ExecStop=/data2/apache-tomcat-9.0.21/bin/shutdown.sh
 
 User=tomcat
 Group=tomcat

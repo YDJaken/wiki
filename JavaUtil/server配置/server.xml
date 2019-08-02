@@ -47,10 +47,8 @@
   <Service name="Catalina">
 
     <!--The connectors can use a shared executor, you can define one or more named thread pools-->
-    <!--
     <Executor name="tomcatThreadPool" namePrefix="catalina-exec-"
-        maxThreads="150" minSpareThreads="4"/>
-    -->
+              maxThreads="512" minSpareThreads="4"/>
 
 
     <!-- A "Connector" represents an endpoint by which requests are received
@@ -60,7 +58,7 @@
          APR (HTTP/AJP) Connector: /docs/apr.html
          Define a non-SSL/TLS HTTP/1.1 Connector on port 8080
     -->
-    <Connector acceptCount="200" compression="on" compressionMinSize="2" connectionTimeout="20000" maxThreads="450" port="8080" protocol="HTTP/1.1" redirectPort="8443"/>
+    <Connector acceptCount="300" compression="on"  pollerThreadCount="512" compressionMinSize="2" connectionTimeout="20000" maxThreads="512" port="8080" protocol="HTTP/1.1" redirectPort="8443" server="DESP"/>
     <!-- A "Connector" using the shared thread pool-->
     <!--
     <Connector executor="tomcatThreadPool"
