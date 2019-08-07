@@ -1,2 +1,2 @@
--  [WEBGL_draw_buffers(多重Framebuffer写入)](https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_draw_buffers)
+- [WEBGL_draw_buffers(多重Framebuffer写入)](https://developer.mozilla.org/en-US/docs/Web/API/WEBGL_draw_buffers)
 - [WEBGL_LightingShading](https://hacks.mozilla.org/2014/01/webgl-deferred-shading/)
