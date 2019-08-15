@@ -8,77 +8,42 @@
 
 // fragCoord xy 当前渲染的位置 单位像素
 
-// its from here https://github.com/achlubek/venginenative/blob/master/shaders/include/WaterHeight.glsl
-float wave(vec2 uv, vec2 emitter, float speed, float phase){
-    float dst = distance(uv, emitter);
-    return pow((0.5 + 0.5 * sin(dst * phase - iTime * speed)), 5.0);
+#define DRAG_MULT 0.048
+#define ITERATIONS_RAYMARCH 13
+#define ITERATIONS_NORMAL 48
+
+#define Mouse (iMouse.xy / iResolution.xy)
+#define Resolution (iResolution.xy)
+#define Time (iTime)
+
+vec2 wavedx(vec2 position, vec2 direction, float speed, float frequency, float timeshift) {
+    float x = dot(direction, position) * frequency + timeshift * speed;
+    float wave = exp(sin(x) - 1.0);
+    float dx = wave * cos(x);
+    return vec2(wave, -dx);
 }
 
-    #define GOLDEN_ANGLE_RADIAN 2.39996
-float getwaves(vec2 uv){
-    float w = 0.0;
-    float sw = 0.0;
+float getwaves(vec2 position, int iterations){
     float iter = 0.0;
-    float ww = 1.0;
-    uv += iTime * 0.5;
-    // it seems its absolutely fastest way for water height function that looks real
-    for(int i=0;i<6;i++){
-        w += ww * wave(uv * 0.06 , vec2(sin(iter), cos(iter)) * 10.0, 2.0 + iter * 0.08, 2.0 + iter * 3.0);
-        sw += ww;
-        ww = mix(ww, 0.0115, 0.4);
-        iter += GOLDEN_ANGLE_RADIAN;
-    }
-
-    return w / sw;
-}
-float getwavesHI(vec2 uv){
+    float phase = 6.0;
+    float speed = 2.0;
+    float weight = 1.0;
     float w = 0.0;
-    float sw = 0.0;
-    float iter = 0.0;
-    float ww = 1.0;
-    uv += iTime * 0.5;
-    // it seems its absolutely fastest way for water height function that looks real
-    for(int i=0;i<24;i++){
-        w += ww * wave(uv * 0.06 , vec2(sin(iter), cos(iter)) * 10.0, 2.0 + iter * 0.08, 2.0 + iter * 3.0);
-        sw += ww;
-        ww = mix(ww, 0.0115, 0.4);
-        iter += GOLDEN_ANGLE_RADIAN;
+    float ws = 0.0;
+    for(int i=0;i<iterations;i++){
+        vec2 p = vec2(sin(iter), cos(iter));
+        vec2 res = wavedx(position, p, speed, phase, Time);
+        position += normalize(p) * res.y * weight * DRAG_MULT;
+        w += res.x * weight;
+        iter += 12.0;
+        ws += weight;
+        weight = mix(weight, 0.0, 0.2);
+        phase *= 1.18;
+        speed *= 1.07;
     }
-
-    return w / sw;
+    return w / ws;
 }
 
-float H = 0.0;
-vec3 normal(vec2 pos, float e, float depth){
-    vec2 ex = vec2(e, 0);
-    H = getwavesHI(pos.xy) * depth;
-    vec3 a = vec3(pos.x, H, pos.y);
-    return normalize(cross(normalize(a-vec3(pos.x - e, getwavesHI(pos.xy - ex.xy) * depth, pos.y)),
-    normalize(a-vec3(pos.x, getwavesHI(pos.xy + ex.yx) * depth, pos.y + e))));
-}
-mat3 rotmat(vec3 axis, float angle)
-{
-    axis = normalize(axis);
-    float s = sin(angle);
-    float c = cos(angle);
-    float oc = 1.0 - c;
-
-    return mat3(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,
-    oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,
-    oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c);
-}
-    #define mouse (iMouse.xy / iResolution.xy)
-vec3 getRay(vec2 uv){
-    uv = (uv * 2.0 - 1.0)* vec2(iResolution.x / iResolution.y, 1.0);
-    vec3 proj = normalize(vec3(uv.x, uv.y, 1.0) + vec3(uv.x, uv.y, -1.0) * pow(length(uv), 2.0) * 0.05);
-
-    vec3 ray = rotmat(vec3(0.0, -1.0, 0.0), mouse.x * 2.0 - 1.0) * rotmat(vec3(1.0, 0.0, 0.0), 1.5 * (mouse.y * 2.0 - 1.0)) * proj;
-    return ray;
-}
-
-float rand2sTimex(vec2 co){
-    return fract(sin(dot(co.xy * iTime,vec2(12.9898,78.233))) * 43758.5453);
-}
 float raymarchwater(vec3 camera, vec3 start, vec3 end, float depth){
     vec3 pos = start;
     float h = 0.0;
@@ -87,7 +52,7 @@ float raymarchwater(vec3 camera, vec3 start, vec3 end, float depth){
     vec2 zer = vec2(0.0);
     vec3 dir = normalize(end - start);
     for(int i=0;i<318;i++){
-        h = getwaves(pos.xz) * depth - depth;
+        h = getwaves(pos.xz * 0.1, ITERATIONS_RAYMARCH) * depth - depth;
         if(h + 0.01 > pos.y) {
             return distance(pos, camera);
         }
@@ -96,10 +61,38 @@ float raymarchwater(vec3 camera, vec3 start, vec3 end, float depth){
     return -1.0;
 }
 
+float H = 0.0;
+vec3 normal(vec2 pos, float e, float depth){
+    vec2 ex = vec2(e, 0);
+    H = getwaves(pos.xy * 0.1, ITERATIONS_NORMAL) * depth;
+    vec3 a = vec3(pos.x, H, pos.y);
+    return normalize(cross(normalize(a-vec3(pos.x - e, getwaves(pos.xy * 0.1 - ex.xy * 0.1, ITERATIONS_NORMAL) * depth, pos.y)),
+    normalize(a-vec3(pos.x, getwaves(pos.xy * 0.1 + ex.yx * 0.1, ITERATIONS_NORMAL) * depth, pos.y + e))));
+}
+mat3 rotmat(vec3 axis, float angle)
+{
+    axis = normalize(axis);
+    float s = sin(angle);
+    float c = cos(angle);
+    float oc = 1.0 - c;
+    return mat3(oc * axis.x * axis.x + c, oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,
+    oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,
+    oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c);
+}
+
+vec3 getRay(vec2 uv){
+    uv = (uv * 2.0 - 1.0) * vec2(Resolution.x / Resolution.y, 1.0);
+    vec3 proj = normalize(vec3(uv.x, uv.y, 1.0) + vec3(uv.x, uv.y, -1.0) * pow(length(uv), 2.0) * 0.05);
+    if(Resolution.x < 400.0) return proj;
+    vec3 ray = rotmat(vec3(0.0, -1.0, 0.0), 3.0 * (Mouse.x * 2.0 - 1.0)) * rotmat(vec3(1.0, 0.0, 0.0), 1.5 * (Mouse.y * 2.0 - 1.0)) * proj;
+    return ray;
+}
+
 float intersectPlane(vec3 origin, vec3 direction, vec3 point, vec3 normal)
 {
     return clamp(dot(point - origin, normal) / dot(direction, normal), -1.0, 9991999.0);
 }
+
 vec3 extra_cheap_atmosphere(vec3 raydir, vec3 sundir){
     sundir.y = max(sundir.y, -0.07);
     float special_trick = 1.0 / (raydir.y * 1.0 + 0.1);
@@ -109,9 +102,9 @@ vec3 extra_cheap_atmosphere(vec3 raydir, vec3 sundir){
     float mymie = sundt * special_trick * 0.2;
     vec3 suncolor = mix(vec3(1.0), max(vec3(0.0), vec3(1.0) - vec3(5.5, 13.0, 22.4) / 22.4), special_trick2);
     vec3 bluesky= vec3(5.5, 13.0, 22.4) / 22.4 * suncolor;
-    vec3 bluesky2 = max(vec3(0.0), bluesky - vec3(5.5, 13.0, 22.4) * 0.004 * (special_trick + -6.0 * sundir.y * sundir.y));
+    vec3 bluesky2 = max(vec3(0.0), bluesky - vec3(5.5, 13.0, 22.4) * 0.002 * (special_trick + -6.0 * sundir.y * sundir.y));
     bluesky2 *= special_trick * (0.24 + raysundt * 0.24);
-    return bluesky2 + mymie * suncolor;
+    return bluesky2 * (1.0 + 1.0 * pow(1.0 - raydir.y, 3.0)) + mymie * suncolor;
 }
 vec3 getatm(vec3 ray){
     return extra_cheap_atmosphere(ray, normalize(vec3(1.0))) * 0.5;
@@ -122,7 +115,22 @@ float sun(vec3 ray){
     vec3 sd = normalize(vec3(1.0));
     return pow(max(0.0, dot(ray, sd)), 528.0) * 110.0;
 }
-
+vec3 aces_tonemap(vec3 color){
+    mat3 m1 = mat3(
+    0.59719, 0.07600, 0.02840,
+    0.35458, 0.90834, 0.13383,
+    0.04823, 0.01566, 0.83777
+    );
+    mat3 m2 = mat3(
+    1.60475, -0.10208, -0.00327,
+    -0.53108,  1.10813, -0.07276,
+    -0.07367, -0.00605,  1.07602
+    );
+    vec3 v = m1 * color;
+    vec3 a = v * (v + 0.0245786) - 0.000090537;
+    vec3 b = v * (0.983729 * v + 0.4329510) + 0.238081;
+    return pow(clamp(m2 * (a / b), 0.0, 1.0), vec3(1.0 / 2.2));
+}
 void mainImage( out vec4 fragColor, in vec2 fragCoord )
 {
     vec2 uv = fragCoord.xy / iResolution.xy;
@@ -136,7 +144,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     if(ray.y >= -0.01){
         vec3 C = getatm(ray) * 2.0 + sun(ray);
         //tonemapping
-        C = normalize(C) * sqrt(length(C));
+        C = aces_tonemap(C);
         fragColor = vec4( C,1.0);
         return;
     }
@@ -154,7 +162,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 
     vec3 C = fresnel * getatm(R) * 2.0 + fresnel * sun(R);
     //tonemapping
-    C = normalize(C) * sqrt(length(C));
+    C = aces_tonemap(C);
 
     fragColor = vec4(C,1.0);
 }

@@ -14,20 +14,22 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
---><!-- Note:  A "Server" is not itself a "Container", so you may not
+-->
+<!-- Note:  A "Server" is not itself a "Container", so you may not
      define subcomponents such as "Valves" at this level.
      Documentation at /docs/config/server.html
- --><Server port="8005" shutdown="SHUTDOWN">
-  <Listener className="org.apache.catalina.startup.VersionLoggerListener"/>
+ -->
+<Server port="8005" shutdown="SHUTDOWN">
+  <Listener className="org.apache.catalina.startup.VersionLoggerListener" />
   <!-- Security listener. Documentation at /docs/config/listeners.html
   <Listener className="org.apache.catalina.security.SecurityListener" />
   -->
   <!--APR library loader. Documentation at /docs/apr.html -->
-  <Listener SSLEngine="on" className="org.apache.catalina.core.AprLifecycleListener"/>
+  <Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="off" />
   <!-- Prevent memory leaks due to use of particular java/javax APIs-->
-  <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener"/>
-  <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener"/>
-  <Listener className="org.apache.catalina.core.ThreadLocalLeakPreventionListener"/>
+  <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener" />
+  <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
+  <Listener className="org.apache.catalina.core.ThreadLocalLeakPreventionListener" />
 
   <!-- Global JNDI resources
        Documentation at /docs/jndi-resources-howto.html
@@ -36,7 +38,11 @@
     <!-- Editable user database that can also be used by
          UserDatabaseRealm to authenticate users
     -->
-    <Resource auth="Container" description="User database that can be updated and saved" factory="org.apache.catalina.users.MemoryUserDatabaseFactory" name="UserDatabase" pathname="conf/tomcat-users.xml" type="org.apache.catalina.UserDatabase"/>
+    <Resource name="UserDatabase" auth="Container"
+              type="org.apache.catalina.UserDatabase"
+              description="User database that can be updated and saved"
+              factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
+              pathname="conf/tomcat-users.xml" />
   </GlobalNamingResources>
 
   <!-- A "Service" is a collection of one or more "Connectors" that share
@@ -48,7 +54,7 @@
 
     <!--The connectors can use a shared executor, you can define one or more named thread pools-->
     <Executor name="tomcatThreadPool" namePrefix="catalina-exec-"
-              maxThreads="512" minSpareThreads="4"/>
+        maxThreads="2048" minSpareThreads="4"/>
 
 
     <!-- A "Connector" represents an endpoint by which requests are received
@@ -58,7 +64,7 @@
          APR (HTTP/AJP) Connector: /docs/apr.html
          Define a non-SSL/TLS HTTP/1.1 Connector on port 8080
     -->
-    <Connector acceptCount="300" compression="on"  pollerThreadCount="512" compressionMinSize="2" connectionTimeout="20000" maxThreads="512" port="8080" protocol="HTTP/1.1" redirectPort="8443" server="DESP"/>
+    <Connector URIEncoding="UTF-8" executor="tomcatThreadPool" acceptCount="800" compression="on"  pollerThreadCount="1024" compressionMinSize="4096" connectionTimeout="20000" maxThreads="2048" port="8080" protocol="org.apache.coyote.http11.Http11AprProtocol" redirectPort="8443" server="DESP" />
     <!-- A "Connector" using the shared thread pool-->
     <!--
     <Connector executor="tomcatThreadPool"
@@ -103,7 +109,7 @@
     -->
 
     <!-- Define an AJP 1.3 Connector on port 8009 -->
-    <Connector port="8009" protocol="AJP/1.3" redirectPort="8443"/>
+    <Connector URIEncoding="UTF-8" port="8009" protocol="org.apache.coyote.ajp.AjpAprProtocol" redirectPort="8443" />
 
 
     <!-- An Engine represents the entry point (within Catalina) that processes
@@ -115,7 +121,7 @@
     <!-- You should set jvmRoute to support load-balancing via AJP ie :
     <Engine name="Catalina" defaultHost="localhost" jvmRoute="jvm1">
     -->
-    <Engine defaultHost="localhost" name="Catalina">
+    <Engine name="Catalina" defaultHost="localhost">
 
       <!--For clustering, please take a look at documentation at:
           /docs/cluster-howto.html  (simple how to)
@@ -131,10 +137,12 @@
              resources under the key "UserDatabase".  Any edits
              that are performed against this UserDatabase are immediately
              available for use by the Realm.  -->
-        <Realm className="org.apache.catalina.realm.UserDatabaseRealm" resourceName="UserDatabase"/>
+        <Realm className="org.apache.catalina.realm.UserDatabaseRealm"
+               resourceName="UserDatabase"/>
       </Realm>
 
-      <Host appBase="webapps" autoDeploy="true" name="localhost" unpackWARs="true">
+      <Host name="localhost"  appBase="webapps"
+            unpackWARs="true" autoDeploy="true">
 
         <!-- SingleSignOn valve, share authentication between web applications
              Documentation at: /docs/config/valve.html -->
@@ -145,9 +153,15 @@
         <!-- Access log processes all example.
              Documentation at: /docs/config/valve.html
              Note: The pattern used is equivalent to using pattern="common" -->
-        <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs" pattern="%h %l %u %t &quot;%r&quot; %s %b" prefix="localhost_access_log" suffix=".txt"/>
-        <Context docBase="/data/DownLoad/Terrain/normal" path="/normal" reloadable="false"/>
-      <Context docBase="NewYorkDonwloader" path="/NewYorkDonwloader" reloadable="true" source="org.eclipse.jst.jee.server:NewYorkDonwloader"/><Context docBase="TerrainDownloader" path="/TerrainDownloader" reloadable="true" source="org.eclipse.jst.jee.server:TerrainDownloader"/><Context docBase="MapDownloader" path="/MapDownloader" reloadable="true" source="org.eclipse.jst.jee.server:MapDownloader"/><Context docBase="graphhopperRouting" path="/graphhopperRouting" reloadable="true" source="org.eclipse.jst.jee.server:graphhopperRouting"/></Host>
+        <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
+               prefix="localhost_access_log" suffix=".txt"
+               pattern="%h %l %u %t &quot;%r&quot; %s %b" />
+
+        <Context  docBase="/data2/DESP_DATA/World_DEM" path="/DATA" override="true" reloadable="false">
+          <Resources cachingAllowed="true" cacheMaxSize="1024000" />
+        </Context>
+
+      </Host>
     </Engine>
   </Service>
 </Server>
