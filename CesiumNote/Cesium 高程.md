@@ -7,4 +7,59 @@ Cesium.when(promise, function(updatedPositions) {}
 获取其高程信息
 
 
-http://blog.sina.com.cn/yanzhe2sasa
+```
+// 修改地下地形
+viewer.scene.screenSpaceCameraController.enableCollisionDetection = false;
+let tileProvider = viewer.scene.globe._surface._tileProvider;
+tileProvider._renderState = despCore.RenderState.fromCache({
+    'cull': {
+        'enabled': false
+    },
+    'depthTest': {
+        'enabled': true,
+        'func': 513
+    },
+    'blending': {
+        "enabled": true,
+        "equationRgb": 32774,
+        "equationAlpha": 32774,
+        "functionSourceRgb": 770,
+        "functionSourceAlpha": 770,
+        "functionDestinationRgb": 771,
+        "functionDestinationAlpha": 771
+    }
+});
+
+tileProvider._blendRenderState = despCore.RenderState.fromCache({
+        'cull': {
+            'enabled': false
+        },
+        'depthTest': {
+            'enabled': true,
+            'func': 515
+        },
+        'blending': {
+            "enabled": true,
+            "equationRgb": 32774,
+            "equationAlpha": 32774,
+            "functionSourceRgb": 770,
+            "functionSourceAlpha": 770,
+            "functionDestinationRgb": 771,
+            "functionDestinationAlpha": 771
+        }
+    }
+);
+let backup = despCore.Occluder.prototype.isBoundingSphereVisible;
+
+despCore.Occluder.prototype.isBoundingSphereVisible = function (point) {
+    if (this._horizonDistance === Number.MAX_VALUE) {
+        return true;
+    }
+    return backup.bind(this)(point)
+};
+// Globe.prototype.pickWorldCoordinates = 某个Cesium函数
+despCore.DepthPlane.prototype.execute = function () {
+};
+```
+
+
