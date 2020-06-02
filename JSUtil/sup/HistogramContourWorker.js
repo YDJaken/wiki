@@ -209,6 +209,15 @@ self._showNode = (nodeData, index, value, ctx) => {
         let target = nodeData[i];
         for (let j = 0; j < target.length; j++) {
             let subTarget = target[j];
+            for (let k = 0; k < subTarget.length; k++) {
+                let subTem = subTarget[k];
+                subTem[0] *=self.scalar;
+                subTem[1] = self.oriHeight - subTem[1] + 0.5;
+                if(subTem[1] === 0.5){
+                    subTem[1] = 0;
+                }
+                subTem[1] *=self.scalar;
+            }
             ctx.beginPath();
             ctx.strokeStyle = 'rgba(0,0,0,0.75)'
             let first = subTarget[0];
@@ -262,7 +271,9 @@ self.onmessage = (e) => {
     if (!chartObj || !Array.isArray(chartObj) || chartObj.length !== 12) return;
     self.data = chartObj[0];
     let imgWidth = chartObj[1];
+    self.oriWidth = imgWidth;
     let imgHeight = chartObj[2];
+    self.oriHeight = imgHeight;
     self.scalar = chartObj[3];
     self.colorArray = chartObj[4];
     self.heatmap = chartObj[5];
@@ -282,9 +293,8 @@ self.onmessage = (e) => {
         }
         return imgWidth * y + x;
     }
-
     let allImageData = new Uint8ClampedArray(self.imgWidth * self.imgHeight * 4);
-    let imgDatas = new Array(self.imgHeight * self.imgWidth);
+    console.time("11");
     for (let j = 0; j < self.imgHeight; j++) {
         for (let i = 0; i < self.imgWidth; i++) {
             let value;
@@ -300,36 +310,40 @@ self.onmessage = (e) => {
                 dx = dx - g00.x;
                 dy = dy - g00.y;
                 let g00Value = OriginXYtoIndex(g00.x, g00.y);
-                let g01 = {x: g00.x, y: g00.y + 1};
-                let g01Value = OriginXYtoIndex(g01.x, g01.y);
-                let g10 = {x: g00.x + 1, y: g00.y};
-                let g10Value = OriginXYtoIndex(g10.x, g10.y);
-                let g11 = {x: g00.x + 1, y: g00.y + 1};
-                let g11Value = OriginXYtoIndex(g11.x, g11.y);
-
-                let testCase = _checkValid(g00Value) && _checkValid(g01Value);
-                if (testCase && _checkValid(g10Value) && _checkValid(g11Value)) {
-                    g00Value = self.data[g00Value];
-                    g01Value = self.data[g01Value];
-                    g10Value = self.data[g10Value];
-                    g11Value = self.data[g11Value];
-                    value = Interpolation.BilinearInterpolation(g00Value, g10Value, g01Value, g11Value, dx, dy);
-                } else if (testCase) {
-                    g00Value = self.data[g00Value];
-                    g01Value = self.data[g01Value];
-                    value = Interpolation.LinearInterpolation(g00Value, g01Value, dy);
-                } else if (_checkValid(g00Value) && _checkValid(g10Value)) {
-                    g00Value = self.data[g00Value];
-                    g10Value = self.data[g10Value];
-                    value = Interpolation.LinearInterpolation(g00Value, g10Value, dx);
-                } else {
+                if(dx === 0 && dy === 0){
                     value = self.data[g00Value];
+                }else{
+                    let g01 = {x: g00.x, y: g00.y + 1};
+                    let g01Value = OriginXYtoIndex(g01.x, g01.y);
+                    let g10 = {x: g00.x + 1, y: g00.y};
+                    let g10Value = OriginXYtoIndex(g10.x, g10.y);
+                    let g11 = {x: g00.x + 1, y: g00.y + 1};
+                    let g11Value = OriginXYtoIndex(g11.x, g11.y);
+
+                    let testCase = _checkValid(g00Value) && _checkValid(g01Value);
+                    if (testCase && _checkValid(g10Value) && _checkValid(g11Value)) {
+                        g00Value = self.data[g00Value];
+                        g01Value = self.data[g01Value];
+                        g10Value = self.data[g10Value];
+                        g11Value = self.data[g11Value];
+                        value = Interpolation.BilinearInterpolation(g00Value, g10Value, g01Value, g11Value, dx, dy);
+                    } else if (testCase) {
+                        g00Value = self.data[g00Value];
+                        g01Value = self.data[g01Value];
+                        value = Interpolation.LinearInterpolation(g00Value, g01Value, dy);
+                    } else if (_checkValid(g00Value) && _checkValid(g10Value)) {
+                        g00Value = self.data[g00Value];
+                        g10Value = self.data[g10Value];
+                        value = Interpolation.LinearInterpolation(g00Value, g10Value, dx);
+                    } else {
+                        value = self.data[g00Value];
+                    }
                 }
+
             }
             imgData = self._getImgColor(value);
             let xy = {x: i, y: j};
             let imgIndex = self.XYtoIndex(xy.x, self.imgHeight - xy.y - 1);
-            imgDatas[imgIndex] = value;
             imgIndex = imgIndex * 4;
             allImageData[imgIndex++] = Math.floor(imgData.red * 255);
             allImageData[imgIndex++] = Math.floor(imgData.green * 255);
@@ -337,23 +351,27 @@ self.onmessage = (e) => {
             allImageData[imgIndex] = Math.floor(imgData.alpha * 255);
         }
     }
-
+    console.timeEnd("11");
+    console.time("22");
     let chartNodeMap = new ChartNodeMap({
-        nodeData: imgDatas,
-        width: self.imgWidth,
-        height: self.imgHeight,
+        nodeData: self.data,
+        width: imgWidth,
+        height: imgHeight,
         max: self.max,
         min: self.min,
         differ: self.differ,
         splitNumber: self.splitNumber
     });
     chartNodeMap.promise.then(() => {
+        console.timeEnd("22");
+        console.time("33");
         let canvas = new OffscreenCanvas(self.imgWidth, self.imgHeight);
         let ctx = canvas.getContext("2d");
         ctx.lineWidth = 2.0;
         ctx.putImageData(new ImageData(allImageData, self.imgWidth, self.imgHeight), 0, 0);
         self._loadPolygons(chartNodeMap, ctx);
         canvas.convertToBlob().then((data) => {
+            console.timeEnd("33");
             self.postMessage({status: 'success', data: URL.createObjectURL(data)});
         }, (error) => {
             self.postMessage({status: 'fail', data: error});
