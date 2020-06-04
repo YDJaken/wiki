@@ -211,12 +211,19 @@ self._showNode = (nodeData, index, value, ctx) => {
             let subTarget = target[j];
             for (let k = 0; k < subTarget.length; k++) {
                 let subTem = subTarget[k];
-                subTem[0] *=self.scalar;
+                if (subTem[0] > (self.oriWidth - 1)) {
+                    subTem[0] = self.oriWidth;
+                }else{
+                    subTem[0] -= 0.5;
+                }
+
+                subTem[0] *= self.scalar;
                 subTem[1] = self.oriHeight - subTem[1] + 0.5;
-                if(subTem[1] === 0.5){
+                if (subTem[1] === 0.5) {
                     subTem[1] = 0;
                 }
-                subTem[1] *=self.scalar;
+                subTem[1] *= self.scalar;
+                subTem[1] -= 1;
             }
             ctx.beginPath();
             ctx.strokeStyle = 'rgba(0,0,0,0.75)'
@@ -293,66 +300,109 @@ self.onmessage = (e) => {
         }
         return imgWidth * y + x;
     }
+
     let allImageData = new Uint8ClampedArray(self.imgWidth * self.imgHeight * 4);
-    console.time("11");
-    for (let j = 0; j < self.imgHeight; j++) {
-        for (let i = 0; i < self.imgWidth; i++) {
+    const scalar = self.scalar;
+    const differ = 1 / scalar;
+    for (let j = 0; j < imgHeight; j++) {
+        for (let i = 0; i < imgWidth; i++) {
+            let g00 = {x: i, y: j};
+            let g00Value = OriginXYtoIndex(g00.x, g00.y);
+            let g01 = {x: g00.x, y: g00.y + 1};
+            let g01Value = OriginXYtoIndex(g01.x, g01.y);
+            let g10 = {x: g00.x + 1, y: g00.y};
+            let g10Value = OriginXYtoIndex(g10.x, g10.y);
+            let g11 = {x: g00.x + 1, y: g00.y + 1};
+            let g11Value = OriginXYtoIndex(g11.x, g11.y);
+            let testCase = _checkValid(g00Value) && _checkValid(g01Value);
+            let dx = 0, dy = 0;
             let value;
             let imgData;
-            if (self.scalar === 1) {
-                let g00 = {x: i, y: j};
-                let g00Value = OriginXYtoIndex(g00.x, g00.y);
-                value = self.data[g00Value];
-            } else {
-                let dx = i / self.scalar;
-                let dy = j / self.scalar;
-                let g00 = {x: Math.floor(dx), y: Math.floor(dy)};
-                dx = dx - g00.x;
-                dy = dy - g00.y;
-                let g00Value = OriginXYtoIndex(g00.x, g00.y);
-                if(dx === 0 && dy === 0){
-                    value = self.data[g00Value];
-                }else{
-                    let g01 = {x: g00.x, y: g00.y + 1};
-                    let g01Value = OriginXYtoIndex(g01.x, g01.y);
-                    let g10 = {x: g00.x + 1, y: g00.y};
-                    let g10Value = OriginXYtoIndex(g10.x, g10.y);
-                    let g11 = {x: g00.x + 1, y: g00.y + 1};
-                    let g11Value = OriginXYtoIndex(g11.x, g11.y);
-
-                    let testCase = _checkValid(g00Value) && _checkValid(g01Value);
-                    if (testCase && _checkValid(g10Value) && _checkValid(g11Value)) {
-                        g00Value = self.data[g00Value];
-                        g01Value = self.data[g01Value];
-                        g10Value = self.data[g10Value];
-                        g11Value = self.data[g11Value];
-                        value = Interpolation.BilinearInterpolation(g00Value, g10Value, g01Value, g11Value, dx, dy);
-                    } else if (testCase) {
-                        g00Value = self.data[g00Value];
-                        g01Value = self.data[g01Value];
-                        value = Interpolation.LinearInterpolation(g00Value, g01Value, dy);
-                    } else if (_checkValid(g00Value) && _checkValid(g10Value)) {
-                        g00Value = self.data[g00Value];
-                        g10Value = self.data[g10Value];
-                        value = Interpolation.LinearInterpolation(g00Value, g10Value, dx);
-                    } else {
-                        value = self.data[g00Value];
+            let startX = i * scalar;
+            let startY = j * scalar;
+            if (testCase && _checkValid(g10Value) && _checkValid(g11Value)) {
+                g00Value = self.data[g00Value];
+                g01Value = self.data[g01Value];
+                g10Value = self.data[g10Value];
+                g11Value = self.data[g11Value];
+                for (let k = 0; k < scalar; k++) {
+                    dx = 0;
+                    for (let l = 0; l < scalar; l++) {
+                        if (dx === 0 && dy === 0) {
+                            value = g00Value;
+                        } else {
+                            value = Interpolation.BilinearInterpolation(g00Value, g10Value, g01Value, g11Value, dx, dy);
+                        }
+                        imgData = self._getImgColor(value);
+                        let xy = {x: startX + l, y: startY + k};
+                        let imgIndex = self.XYtoIndex(xy.x, self.imgHeight - xy.y - 1);
+                        imgIndex = imgIndex * 4;
+                        allImageData[imgIndex++] = Math.floor(imgData.red * 255);
+                        allImageData[imgIndex++] = Math.floor(imgData.green * 255);
+                        allImageData[imgIndex++] = Math.floor(imgData.blue * 255);
+                        allImageData[imgIndex] = Math.floor(imgData.alpha * 255);
+                        dx += differ;
+                    }
+                    dy += differ;
+                }
+            } else if (testCase) {
+                g00Value = self.data[g00Value];
+                g01Value = self.data[g01Value];
+                for (let k = 0; k < scalar; k++) {
+                    dy = 0;
+                    for (let l = 0; l < scalar; l++) {
+                        if (dx === 0 && dy === 0) {
+                            value = g00Value;
+                        } else {
+                            value = Interpolation.LinearInterpolation(g00Value, g01Value, dy);
+                        }
+                        imgData = self._getImgColor(value);
+                        let xy = {x: startX + k, y: startY + l};
+                        let imgIndex = self.XYtoIndex(xy.x, self.imgHeight - xy.y - 1);
+                        imgIndex = imgIndex * 4;
+                        allImageData[imgIndex++] = Math.floor(imgData.red * 255);
+                        allImageData[imgIndex++] = Math.floor(imgData.green * 255);
+                        allImageData[imgIndex++] = Math.floor(imgData.blue * 255);
+                        allImageData[imgIndex] = Math.floor(imgData.alpha * 255);
+                        dy += differ;
                     }
                 }
-
+            } else if (_checkValid(g00Value) && _checkValid(g10Value)) {
+                g00Value = self.data[g00Value];
+                g10Value = self.data[g10Value];
+                for (let k = 0; k < scalar; k++) {
+                    dx = 0;
+                    for (let l = 0; l < scalar; l++) {
+                        if (dx === 0 && dy === 0) {
+                            value = g00Value;
+                        } else {
+                            value = Interpolation.LinearInterpolation(g00Value, g10Value, dx);
+                        }
+                        imgData = self._getImgColor(value);
+                        let xy = {x: startX + l, y: startY + k};
+                        let imgIndex = self.XYtoIndex(xy.x, self.imgHeight - xy.y - 1);
+                        imgIndex = imgIndex * 4;
+                        allImageData[imgIndex++] = Math.floor(imgData.red * 255);
+                        allImageData[imgIndex++] = Math.floor(imgData.green * 255);
+                        allImageData[imgIndex++] = Math.floor(imgData.blue * 255);
+                        allImageData[imgIndex] = Math.floor(imgData.alpha * 255);
+                        dx += differ;
+                    }
+                }
+            } else {
+                value = self.data[g00Value];
+                imgData = self._getImgColor(value);
+                let xy = {x: startX, y: startY};
+                let imgIndex = self.XYtoIndex(xy.x, self.imgHeight - xy.y - 1);
+                imgIndex = imgIndex * 4;
+                allImageData[imgIndex++] = Math.floor(imgData.red * 255);
+                allImageData[imgIndex++] = Math.floor(imgData.green * 255);
+                allImageData[imgIndex++] = Math.floor(imgData.blue * 255);
+                allImageData[imgIndex] = Math.floor(imgData.alpha * 255);
             }
-            imgData = self._getImgColor(value);
-            let xy = {x: i, y: j};
-            let imgIndex = self.XYtoIndex(xy.x, self.imgHeight - xy.y - 1);
-            imgIndex = imgIndex * 4;
-            allImageData[imgIndex++] = Math.floor(imgData.red * 255);
-            allImageData[imgIndex++] = Math.floor(imgData.green * 255);
-            allImageData[imgIndex++] = Math.floor(imgData.blue * 255);
-            allImageData[imgIndex] = Math.floor(imgData.alpha * 255);
         }
     }
-    console.timeEnd("11");
-    console.time("22");
+
     let chartNodeMap = new ChartNodeMap({
         nodeData: self.data,
         width: imgWidth,
@@ -363,15 +413,12 @@ self.onmessage = (e) => {
         splitNumber: self.splitNumber
     });
     chartNodeMap.promise.then(() => {
-        console.timeEnd("22");
-        console.time("33");
         let canvas = new OffscreenCanvas(self.imgWidth, self.imgHeight);
         let ctx = canvas.getContext("2d");
         ctx.lineWidth = 2.0;
         ctx.putImageData(new ImageData(allImageData, self.imgWidth, self.imgHeight), 0, 0);
         self._loadPolygons(chartNodeMap, ctx);
         canvas.convertToBlob().then((data) => {
-            console.timeEnd("33");
             self.postMessage({status: 'success', data: URL.createObjectURL(data)});
         }, (error) => {
             self.postMessage({status: 'fail', data: error});
