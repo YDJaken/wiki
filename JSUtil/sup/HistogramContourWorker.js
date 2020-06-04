@@ -213,7 +213,7 @@ self._showNode = (nodeData, index, value, ctx) => {
                 let subTem = subTarget[k];
                 if (subTem[0] > (self.oriWidth - 1)) {
                     subTem[0] = self.oriWidth;
-                }else{
+                } else {
                     subTem[0] -= 0.5;
                 }
 
@@ -318,8 +318,8 @@ self.onmessage = (e) => {
             let dx = 0, dy = 0;
             let value;
             let imgData;
-            let startX = i * scalar;
-            let startY = j * scalar;
+            let startX = g00.x * scalar;
+            let startY = g00.y * scalar;
             if (testCase && _checkValid(g10Value) && _checkValid(g11Value)) {
                 g00Value = self.data[g00Value];
                 g01Value = self.data[g01Value];
@@ -402,7 +402,6 @@ self.onmessage = (e) => {
             }
         }
     }
-
     let chartNodeMap = new ChartNodeMap({
         nodeData: self.data,
         width: imgWidth,
