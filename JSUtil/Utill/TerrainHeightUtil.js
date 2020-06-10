@@ -1,34 +1,38 @@
 /**
  * @Author DY
  */
-import {dependencies, dom_need, Global_viewer} from "../Constants.js";
+import {dependencies} from "../Constants.js";
+import {tifimgGetter} from "../../despCore/Entry/EntryManager.js";
+
 import Ellipsoid from "../Math/Ellipsoid.js";
-
-let echarts = dependencies.echarts, echartsID = dom_need.echarts;
-
 import Coordinate from "../Math/Coordinate.js";
 import Point from "../Math/Geometry/2D/Point.js";
+import Rectangle from "../Entity/Rectangle.js";
+
 import PromiseChain from "./PromiseChain.js";
-import ColorUtil from "./ColorUtil.js";
 
-export const TerrainHeight_echart = {charts: null};
-
+/**
+ * @class TerrainHeight
+ * @classdesc 获取高程工具类
+ */
 export default class TerrainHeight {
     /**
-     *
-     * @param obj {position,terrainProvider,granularity}
-     * @param onSuccess
-     * @param onFail
-     * 示例：
+     * 获取一段线按照某个间隔产生的所有点的高程
+     * @param {Object} obj - {position,terrainProvider,granularity}
+     * @param {Function} onSuccess - 成功回调
+     * @param {Function} onFail - 失败回调
+     * @param onPending
+     * @example
      * let a;
-     TerrainHeight.updateHeight({
-        position: Coordinate.handlePosition([94.0, 24.0, 94.0, 23.0]),
-        terrainProvider: this.viewer.terrainProvider
-      }, function (as) {
-        a = as;
-      });
+     * TerrainHeight.updateHeight({
+     * position: Coordinate.handlePosition([94.0, 24.0, 94.0, 23.0]),
+     * terrainProvider: this.viewer.terrainProvider
+     * }, function (as) {
+     * a = as;
+     * });
      */
-    static updateHeight(obj, onSuccess, onFail) {
+    static updateHeight(obj, onSuccess, onFail, onPending = () => {
+    }) {
         let subposition = dependencies.Cesium.PolylinePipeline.generateArc({
             positions: obj.position,
             granularity: obj.granularity === undefined ? 0.00001 : obj.granularity
@@ -38,13 +42,120 @@ export default class TerrainHeight {
         for (let i = 0; i < subposition.length; i += 3) {
             modifiedPosition.push(ellipos.cartesianToCartographic(new dependencies.Cesium.Cartesian3(subposition[i], subposition[i + 1], subposition[i + 2])));
         }
-        if (obj.terrainProvider instanceof dependencies.Cesium.EllipsoidTerrainProvider) {
-            onSuccess(modifiedPosition);
+
+        if (tifimgGetter.isActive()) {
+            let promises = [];
+            let tmp = [];
+            let size = 0;
+            for (let i = 0; i < modifiedPosition.length; i++) {
+                tmp.push(modifiedPosition[i]);
+                size++;
+                if (size === 20) {
+                    size = 0;
+                    let tmpp = tmp;
+                    promises.push((resolve, reject) => {
+                        let points = "";
+                        for (let i = 0; i < tmpp.length; i++) {
+                            let target = tmpp[i];
+                            points = points + `${target.longitude},${target.latitude}丨`;
+                        }
+                        points = points.substring(0, points.length - 1);
+                        tifimgGetter.loadTifData("default", undefined, undefined, points).then((success) => {
+                            let returnData = JSON.parse(success);
+                            for (let i = 0; i < tmpp.length; i++) {
+                                let target = tmpp[i];
+                                target.height = returnData[i].data[0];
+                            }
+                            let r = onPending(tmpp);
+                            if (r === false) {
+                                reject("Stop By User");
+                            }
+                            resolve(modifiedPosition);
+                        }, (error) => {
+                            reject(error);
+                        });
+                    });
+                    tmp = [];
+                }
+            }
+            if (tmp.length > 0) {
+                promises.push((resolve, reject) => {
+                    let points = "";
+                    for (let i = 0; i < tmp.length; i++) {
+                        let target = tmp[i];
+                        points = points + `${target.longitude},${target.latitude}丨`;
+                    }
+                    points = points.substring(0, points.length - 1);
+                    tifimgGetter.loadTifData("default", undefined, undefined, points).then((success) => {
+                        let returnData = JSON.parse(success);
+                        for (let i = 0; i < tmp.length; i++) {
+                            let target = tmp[i];
+                            target.height = returnData[i].data[0];
+                        }
+                        let r = onPending(tmp);
+                        if (r === false) {
+                            reject("Stop By User");
+                        }
+                        resolve(modifiedPosition);
+                    }, (error) => {
+                        reject(error);
+                    });
+                });
+            }
+            let promiseChain = new PromiseChain(promises, onSuccess, onFail);
+            promiseChain.all();
         } else {
-            dependencies.Cesium.when(dependencies.Cesium.sampleTerrainMostDetailed(obj.terrainProvider, modifiedPosition), onSuccess, onFail);
+            if (obj.terrainProvider instanceof dependencies.Cesium.EllipsoidTerrainProvider) {
+                onSuccess(modifiedPosition);
+            } else {
+                let promises = [];
+                let tmp = [];
+                let size = 0;
+                for (let i = 0; i < modifiedPosition.length; i++) {
+                    tmp.push(modifiedPosition[i]);
+                    size++;
+                    if (size === 300) {
+                        size = 0;
+                        let tmpp = tmp;
+                        promises.push((resolve, reject) => {
+                            dependencies.Cesium.when(dependencies.Cesium.sampleTerrainMostDetailed(obj.terrainProvider, tmpp), (as) => {
+                                let r = onPending(as);
+                                if (r === false) {
+                                    reject("Stop By User");
+                                }
+                                resolve(modifiedPosition);
+                            }, (msg) => {
+                                reject(msg);
+                            });
+                        });
+                        tmp = [];
+                    }
+                }
+                if (tmp.length > 0) {
+                    promises.push((resolve, reject) => {
+                        dependencies.Cesium.when(dependencies.Cesium.sampleTerrainMostDetailed(obj.terrainProvider, tmp), (as) => {
+                            let r = onPending(as);
+                            if (r === false) {
+                                reject("Stop By User");
+                            }
+                            resolve(modifiedPosition);
+                        }, (msg) => {
+                            reject(msg);
+                        });
+                    });
+                }
+                let promiseChain = new PromiseChain(promises, onSuccess, onFail);
+                promiseChain.all();
+            }
         }
     }
 
+    /**
+     * 更新单个点的高程信息
+     * @param {Array} position - [lon,lat,alt]
+     * @param {Object} terrainProvider - 地形服务提供方
+     * @return {Promise}
+     */
     static updatePosition(position, terrainProvider) {
         return new Promise(function (resolve, reject) {
             if (terrainProvider instanceof dependencies.Cesium.EllipsoidTerrainProvider) {
@@ -58,7 +169,7 @@ export default class TerrainHeight {
                         height: position[i + 2]
                     });
                 }
-                dependencies.Cesium.when(dependencies.Cesium.sampleTerrainMostDetailed(Global_viewer.viewer.terrainProvider, ret), (as) => {
+                dependencies.Cesium.when(dependencies.Cesium.sampleTerrainMostDetailed(terrainProvider, ret), (as) => {
                     let index = 0;
                     for (let i = 0; position.length - i >= 3; i += 3) {
                         position[i + 2] = as[index++].height;
@@ -71,6 +182,11 @@ export default class TerrainHeight {
         });
     }
 
+    /**
+     * 生成一个相对于单点的矩阵
+     * @param {Object} obj
+     * @return {Promise}
+     */
     static getMatrix(obj) {
         return new Promise(function (resolve, reject) {
             let matrix = [];
@@ -133,6 +249,12 @@ export default class TerrainHeight {
         });
     }
 
+    /**
+     * 获取单点的矩阵的高度
+     * @param matrix
+     * @param terrainProvider
+     * @return {Promise}
+     */
     static getHeight(matrix, terrainProvider) {
         let index = 0;
         if (terrainProvider instanceof dependencies.Cesium.EllipsoidTerrainProvider) {
@@ -156,34 +278,144 @@ export default class TerrainHeight {
         }
     }
 
-    static getRectangleMatrix(obj, onSuccess, onFail) {
+    /**
+     * 获取大矩阵的高程
+     * @param obj
+     * @param onSuccess
+     * @param onFail
+     * @param onPending
+     */
+    static getRectangleMatrix(obj, onSuccess, onFail, onPending) {
         let granularity = (obj.granularity !== undefined && obj.granularity !== null) ? obj.granularity : 0.00001;
+        let rec = [...obj.Polygon.rectangle];
         let matrix = TerrainHeight.generateMatix(obj.Polygon.rectangle, granularity);
         matrix = TerrainHeight.excludeBound(matrix, obj.Polygon);
-        if (obj.terrainProvider instanceof dependencies.Cesium.EllipsoidTerrainProvider) {
-            onSuccess(matrix);
-        } else {
+        if (tifimgGetter.isActive()) {
             let promises = [];
-            for (let i = 0; i < matrix.length; i++) {
-                let tmp = [];
-                for (let j = 0; j < matrix[i].length; j++) {
-                    if (matrix[i][j] !== 0) tmp.push(matrix[i][j]);
-                }
-                if (tmp.length > 0) {
+            let firstL = matrix.length;
+            let secondL = matrix[0].length;
+            if (firstL * secondL < 30000) {
+                let geojson = Rectangle.toGeoJson2D(rec);
+                promises.push((resolve, reject) => {
+                    tifimgGetter.loadTifData(undefined, JSON.stringify(geojson), granularity, undefined).then((success) => {
+                        let returnData = JSON.parse(success);
+                        let numberBands = returnData.numberBands;
+                        let data = returnData.data;
+                        for (let i = 0; i < data.length; i += numberBands) {
+                            let index = i / numberBands;
+                            let first = Math.floor(index / secondL);
+                            let second = index - first * secondL;
+                            let target = matrix[first][second];
+                            if (target && target !== 0) {
+                                target.height = data[i];
+                            }
+                        }
+                        let r = onPending(returnData);
+                        if (r === false) {
+                            reject("Stop By User");
+                        }
+                        resolve(matrix);
+                    }, (error) => {
+                        reject(error);
+                    });
+                });
+            } else {
+                let minLat = rec[1];
+                let maxLat = rec[3];
+                let totalIndex = Math.ceil((maxLat - minLat) / granularity);
+                for (let i = 0; i < totalIndex; i++) {
+                    let targetLat = minLat + granularity * i;
+                    let tmpRec = [rec[0], targetLat, rec[2], targetLat];
+                    let geojson = Rectangle.toGeoJson2D(tmpRec);
+                    let index = i;
                     promises.push((resolve, reject) => {
-                        dependencies.Cesium.when(dependencies.Cesium.sampleTerrainMostDetailed(obj.terrainProvider, tmp), (as) => {
+                        tifimgGetter.loadTifData(undefined, JSON.stringify(geojson), granularity, undefined).then((success) => {
+                            let returnData = JSON.parse(success);
+                            let numberBands = returnData.numberBands;
+                            let data = returnData.data;
+                            for (let i = 0; i < data.length; i += numberBands) {
+                                let target = matrix[i / numberBands][index];
+                                if (target && target !== 0) {
+                                    target.height = data[i];
+                                }
+                            }
+                            let r = onPending(returnData);
+                            if (r === false) {
+                                reject("Stop By User");
+                            }
                             resolve(matrix);
-                        }, (msg) => {
-                            reject(msg);
+                        }, (error) => {
+                            reject(error);
                         });
                     });
                 }
             }
             let promiseChain = new PromiseChain(promises, onSuccess, onFail);
             promiseChain.all();
+        } else {
+            if (obj.terrainProvider instanceof dependencies.Cesium.EllipsoidTerrainProvider) {
+                onSuccess(matrix);
+            } else {
+                let promises = [];
+                let size = 0;
+                let tmp = [];
+                for (let i = 0; i < matrix.length; i++) {
+                    for (let j = 0; j < matrix[i].length; j++) {
+                        if (matrix[i][j] !== 0) {
+                            tmp.push(matrix[i][j]);
+                            size++;
+                            if (size === 300) {
+                                size = 0;
+                                let tmpp = tmp;
+                                promises.push((resolve, reject) => {
+                                    dependencies.Cesium.when(dependencies.Cesium.sampleTerrainMostDetailed(obj.terrainProvider, tmpp), (as) => {
+                                        let r = onPending(as);
+                                        if (r === false) {
+                                            reject("Stop By User");
+                                        }
+                                        resolve(matrix);
+                                    }, (msg) => {
+                                        reject(msg);
+                                    });
+                                });
+                                tmp = [];
+                            }
+                        }
+                    }
+                    if (tmp.length > 0) {
+                        promises.push((resolve, reject) => {
+                            dependencies.Cesium.when(dependencies.Cesium.sampleTerrainMostDetailed(obj.terrainProvider, tmp), (as) => {
+                                let r = onPending(as);
+                                if (r === false) {
+                                    reject("Stop By User");
+                                }
+                                resolve(matrix);
+                            }, (msg) => {
+                                reject(msg);
+                            });
+                        });
+                    }
+                }
+                let promiseChain = new PromiseChain(promises, onSuccess, onFail);
+                promiseChain.all();
+            }
         }
     }
 
+    static getRectangleData(rectangle, granularity, useDegree = false) {
+        if (tifimgGetter.isActive()) {
+            return tifimgGetter.loadTifData(undefined, JSON.stringify(Rectangle.toGeoJson2D(rectangle)), granularity, undefined, undefined,useDegree);
+        } else {
+            return undefined;
+        }
+    }
+
+    /**
+     * 删除不在范围内的点
+     * @param matrix
+     * @param Polygon
+     * @return {*}
+     */
     static excludeBound(matrix, Polygon) {
         for (let i = 0; i < matrix.length; i++) {
             for (let j = 0; j < matrix[i].length; j++) {
@@ -207,6 +439,12 @@ export default class TerrainHeight {
         return matrix;
     }
 
+    /**
+     * 生成矩形矩阵
+     * @param rectangle
+     * @param granularity
+     * @return {Array}
+     */
     static generateMatix(rectangle, granularity) {
         let startLon = rectangle.shift();
         let startLat = rectangle.shift();
@@ -247,37 +485,25 @@ export default class TerrainHeight {
         return ret;
     }
 
-    static removeChart(dom = document.getElementById(echartsID)) {
-        if (TerrainHeight_echart.charts !== null) TerrainHeight_echart.charts.dispose(dom);
-        TerrainHeight_echart.charts = null;
-        dom.style.display = "none";
-        if (document.getElementById(`${echartsID}_button`) !== null) {
-            document.getElementById(`${echartsID}_button`).parent.removeChild(document.getElementById(`${echartsID}_button`));
-        }
-    }
-
-    static imageColorArray(imgData, matrix, digColor, fillColor) {
-        let imgDataArray = imgData.data;
-        let heightArray = [];
+    /**
+     * 生成颜色对应矩阵
+     * @param widthO
+     * @param heightO
+     * @param matrix
+     * @return {{data: Array, height: Array}}
+     */
+    static imageColorArray(widthO, heightO, matrix) {
+        let heightArray = [], imgDataArray = [];
         let max = -Infinity, min = Infinity;
-        for (let i = 0; i < imgDataArray.length / 4; i++) {
-            let width = i % imgData.width, height = imgData.height - Math.floor(i / imgData.width);
+        for (let i = 0; i < widthO * heightO; i++) {
+            let width = i % widthO, height = heightO - Math.floor(i / widthO);
             if (matrix[width][height - 1] !== 0) {
-                if (matrix[width][height - 1].DESPEWA === 1) {
-                    imgDataArray[i * 4] = digColor.r;
-                    imgDataArray[i * 4 + 1] = digColor.g;
-                    imgDataArray[i * 4 + 2] = digColor.b;
-                    imgDataArray[i * 4 + 3] = 255;
-                } else if (matrix[width][height - 1].DESPEWA === 2) {
-                    imgDataArray[i * 4] = fillColor.r;
-                    imgDataArray[i * 4 + 1] = fillColor.g;
-                    imgDataArray[i * 4 + 2] = fillColor.b;
-                    imgDataArray[i * 4 + 3] = 255;
-                }
+                imgDataArray.push(matrix[width][height - 1].DESPEWA);
                 heightArray.push([width, height, matrix[width][height - 1].height]);
                 max = Math.max(max, matrix[width][height - 1].height);
                 min = Math.min(min, matrix[width][height - 1].height);
             } else {
+                imgDataArray.push(0);
                 heightArray.push([width, height, 0]);
             }
         }
@@ -292,173 +518,5 @@ export default class TerrainHeight {
             data: imgDataArray,
             height: heightArray
         }
-    }
-
-    static loadEarthWork(matrix, propertiesNumber, digColor, fillColor) {
-        let img = new Image();
-        img.height = matrix[0].length;
-        img.width = matrix.length;
-        let canvas = document.createElement('canvas');
-        canvas.height = img.height;
-        canvas.width = img.width;
-        let ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, img.width, img.height);
-        let imgDataArray = TerrainHeight.imageColorArray(ctx.getImageData(0, 0, img.width, img.height), matrix, ColorUtil.hex2Rgba(digColor), ColorUtil.hex2Rgba(fillColor));
-        let dom = document.getElementById(echartsID);
-        dom.style.display = "block";
-        if (TerrainHeight_echart.charts === null) TerrainHeight_echart.charts = echarts.init(dom, 'light', {renderer: 'canvas'});
-        let min = imgDataArray.height.pop();
-        let max = imgDataArray.height.pop();
-        TerrainHeight_echart.charts.setOption({
-            title: {
-                text:
-                    `挖填方分析
-        
-        挖掘土方量: ${propertiesNumber.digAmount} 立方米
-        
-        挖掘面积: ${propertiesNumber.digArea} 平方米
-        
-        填埋土方量: ${propertiesNumber.fillAmount} 立方米
-        
-        填埋面积: ${propertiesNumber.fillArea} 平方米`
-            }
-            , tooltip: {},
-            backgroundColor: '#fff',
-            xAxis3D: {
-                type: 'value'
-            },
-            yAxis3D: {
-                type: 'value'
-            },
-            zAxis3D: {
-                type: 'value',
-                min: min,
-                max: max
-            },
-            grid3D: {
-                axisPointer: {
-                    show: false
-                },
-                viewControl: {
-                    distance: 100
-                },
-                postEffect: {
-                    enable: true
-                },
-                light: {
-                    main: {
-                        shadow: true,
-                        intensity: 2
-                    },
-                    ambientCubemap: {
-                        texture: 'static/echart/canyon.hdr',
-                        exposure: 2,
-                        diffuseIntensity: 0.2,
-                        specularIntensity: 1
-                    }
-                }
-            },
-            series: [{
-                type: 'surface',
-                silent: true,
-                wireframe: {
-                    show: false
-                },
-                itemStyle: {
-                    color: function (params) {
-                        let i = params.dataIndex;
-                        let r = imgDataArray.data[i * 4];
-                        let g = imgDataArray.data[i * 4 + 1];
-                        let b = imgDataArray.data[i * 4 + 2];
-                        return 'rgb(' + [r, g, b].join(',') + ')';
-                    }, opacity: 0.8
-                },
-                data: imgDataArray.height
-            }]
-        });
-        if (document.getElementById(`${echartsID}_button`) === null) {
-            document.getElementById(echartsID).firstChild.appendChild(TerrainHeight.creathButton());
-        }
-    }
-
-    static loadCrossSection(position) {
-        let heightArray = [];
-        let xAx = [];
-        for (let i = 0; i < position.length; i++) {
-            heightArray.push(position[i].height);
-            xAx.push(`经度:${Coordinate.radianToAngle(position[i].longitude)},纬度:${Coordinate.radianToAngle(position[i].latitude)},海拔`);
-        }
-        let dom = document.getElementById(echartsID);
-        dom.style.display = "block";
-        if (TerrainHeight_echart.charts === null) TerrainHeight_echart.charts = echarts.init(dom, 'dark');
-        TerrainHeight_echart.charts.setOption({
-            title: {
-                text: '剖面分析'
-            },
-            tooltip: {},
-            legend: {
-                data: ['剖面分析']
-            }, /*toolbox: {
-                            left: 'center',
-                            feature: {
-                                dataZoom: {
-                                    yAxisIndex: 'none'
-                                },
-                                restore: {},
-                                saveAsImage: {}
-                            }
-                        },*/
-            dataZoom: [{
-                startValue: 0
-            }, {
-                type: 'inside'
-            }],
-            xAxis: {show: false, data: xAx},
-            yAxis: {},
-            series: [{
-                name: '剖面分析',
-                type: 'line',
-                data: heightArray,
-                smooth: true,
-                areaStyle: {
-                    color: {
-                        type: 'linear',
-                        x: 0,
-                        y: 0,
-                        x2: 1,
-                        y2: 1,
-                        colorStops: [{
-                            offset: 0, color: 'red' // 0% 处的颜色
-                        }, {
-                            offset: 1, color: 'blue' // 100% 处的颜色
-                        }],
-                        globalCoord: false // 缺省为 false
-                    }
-                }
-            }]
-        });
-        if (document.getElementById(`${echartsID}_button`) === null) {
-            document.getElementById(echartsID).firstChild.appendChild(TerrainHeight.creathButton());
-        }
-    }
-
-    static creathButton() {
-        let a = document.createElement('button');
-        a.style = "z-index: 99999; position: absolute; left:95%; overflow: dispaly; border-width: 0px;" +
-            "    padding: 4px 4px 0 0;\n" +
-            "    text-align: center;\n" +
-            "    width: 36px;\n" +
-            "    height: 28px;\n" +
-            "    font: 16px/14px Tahoma, Verdana, sans-serif;\n" +
-            "    color: #ffffff;\n" +
-            "    text-decoration: none;\n" +
-            "    font-weight: bold;\n" +
-            "    background: transparent;";
-        a.id = `${echartsID}_button`;
-        a.innerText = 'x';
-        a.onclick = function () {
-            TerrainHeight.removeChart();
-        };
-        return a;
     }
 }

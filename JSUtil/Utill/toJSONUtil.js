@@ -2,7 +2,16 @@
  * @Author DY
  */
 
+/**
+ * @class toJSONUtil
+ * @classdesc JSON工具类
+ */
 export default class toJSONUtil {
+    /**
+     * 将对象转换为JSON
+     * @param obj
+     * @return {string}
+     */
     static toJSON(obj) {
         if (Array.isArray(obj)) {
             let ret = '[';
@@ -34,6 +43,10 @@ export default class toJSONUtil {
             ret = ret.substring(0, ret.length - 1);
             ret += '}';
             return ret;
+        } else if (obj === undefined) {
+            return "undefined";
+        } else if (obj === null) {
+            return "null";
         } else {
             if (typeof obj === "number") {
                 return obj.toString();
@@ -42,9 +55,28 @@ export default class toJSONUtil {
         }
     }
 
+    /**
+     * 将对象转换为GeoJSON
+     * @param Array
+     * @param isPolygon
+     * @return {Array[]|Array}
+     */
     static toGeojson(Array, isPolygon = false) {
         let ret = [];
         for (let i = 0; i < Array.length; i += 3) {
+            ret.push([Array[i], Array[i + 1]])
+        }
+        if (isPolygon) {
+            ret.push([Array[0], Array[1]]);
+            return [ret];
+        } else {
+            return ret;
+        }
+    }
+
+    static toGeojson2D(Array, isPolygon = false) {
+        let ret = [];
+        for (let i = 0; i < Array.length; i += 2) {
             ret.push([Array[i], Array[i + 1]])
         }
         if (isPolygon) {
