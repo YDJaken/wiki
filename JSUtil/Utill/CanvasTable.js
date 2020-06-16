@@ -1,6 +1,8 @@
 import Line from "./Entity/Line.js";
 import Check from "./Check.js";
-
+/**
+ * @Author DY
+ */
 export default class CanvasTable {
     constructor(src) {
         this.canvas = document.createElement("canvas");
