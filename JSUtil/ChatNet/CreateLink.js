@@ -213,7 +213,12 @@ export default class CreateLink {
     async _handleVideoOfferMsg(msg) {
         const targetUsername = msg.name;
 
-        this.onInvite(msg);
+        let flag = this.onInvite(msg);
+
+        if (flag === false) {
+            this._endPeerLink();
+            return;
+        }
 
         if (!Check.checkDefined(this.peerConnection)) {
             this._startPeerLink();
