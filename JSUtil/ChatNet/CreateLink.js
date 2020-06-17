@@ -154,30 +154,6 @@ export default class CreateLink {
         this.peerConnection = undefined;
     }
 
-    activeSocket() {
-        if (Check.checkDefined(this.webSocket)) {
-            return;
-        }
-        this.webSocket = NetLinkUtil.createSocket(this.url, this.protocols);
-
-        this.webSocket.onclose = () => {
-            this.deActiveSocket();
-        };
-        this.webSocket.onopen = this.onopen;
-        this.webSocket.onerror = this.onerror;
-        this.webSocket.onmessage = (evt) => {
-            if (evt.data instanceof Blob) {
-                evt.data.arrayBuffer().then((data) => {
-                    this._loadSetData(BinaryCodec.decode(data));
-                }, (error) => {
-                    this.onerror(error);
-                });
-            } else {
-                this._loadSetData(evt.data);
-            }
-        };
-    }
-
     _sendToServer(msg) {
         if (!Check.checkDefined(this.webSocket)) {
             return;
@@ -188,6 +164,11 @@ export default class CreateLink {
     _loadSetData(data) {
         let msg = JSON.parse(data);
         switch (msg.type) {
+            case "geoLocation":
+                this.onGeoLocationChange(msg);
+                break;
+            case "userlist":
+                break;
             case "iceConfig":
                 this.iceConfig = data.data;
                 break;
@@ -209,7 +190,7 @@ export default class CreateLink {
                 }
                 break;
             case "AdminName":
-                this.adminName = msg.name;
+                this.name = msg.name;
                 break;
             case "video-offer":
                 this._handleVideoOfferMsg(msg);
@@ -221,7 +202,7 @@ export default class CreateLink {
                 this._handleNewICECandidateMsg(msg);
                 break;
             case "hang-up":
-                this._handleHangUpMsg(msg);
+                this._endPeerLink(msg);
                 break;
             default:
                 this.onerror("Unknown message received:");
@@ -231,6 +212,9 @@ export default class CreateLink {
 
     async _handleVideoOfferMsg(msg) {
         const targetUsername = msg.name;
+
+        this.onInvite(msg);
+
         if (!Check.checkDefined(this.peerConnection)) {
             this._startPeerLink();
         }
@@ -261,7 +245,11 @@ export default class CreateLink {
             return;
         }
         let desc = new RTCSessionDescription(msg.sdp);
-        await this.peerConnection.setRemoteDescription(desc).catch(reportError);
+        await this.peerConnection.setRemoteDescription(desc).then(() => {
+            this.onConnection();
+        }).catch((error) => {
+            this.onerror(error)
+        });
     }
 
     async _handleNewICECandidateMsg(msg) {
@@ -276,8 +264,28 @@ export default class CreateLink {
         }
     }
 
-    _handleHangUpMsg() {
-        this._endPeerLink();
+    activeSocket() {
+        if (Check.checkDefined(this.webSocket)) {
+            return;
+        }
+        this.webSocket = NetLinkUtil.createSocket(this.url, this.protocols);
+
+        this.webSocket.onclose = () => {
+            this.deActiveSocket();
+        };
+        this.webSocket.onopen = this.onopen;
+        this.webSocket.onerror = this.onerror;
+        this.webSocket.onmessage = (evt) => {
+            if (evt.data instanceof Blob) {
+                evt.data.arrayBuffer().then((data) => {
+                    this._loadSetData(BinaryCodec.decode(data));
+                }, (error) => {
+                    this.onerror(error);
+                });
+            } else {
+                this._loadSetData(evt.data);
+            }
+        };
     }
 
     deActiveSocket() {
@@ -318,16 +326,25 @@ export default class CreateLink {
             return;
         }
 
-        this.viedeoDom = window.document.createElement("video");
+        this.videoDom = window.document.createElement("video");
 
-        this.viedeoDom.autoplay = true;
+        this.videoDom.autoplay = true;
 
-        this.viedeoDom.style.display = "none";
+        this.videoDom.height = 200;
+        this.videoDom.width = 300;
+
+        this.videoDom.style.display = "none";
+        this.videoDom.style.position = "absolute";
+        this.videoDom.style.height = "200px";
+        this.videoDom.style.width = "300px";
 
         this.peerConnection = NetLinkUtil.createPeerConnection(this.iceConfig);
 
         this.peerConnection.ontrack = (evt) => {
-            this.viedeoDom.srcObject = evt.streams[0];
+            if (this.videoDom.paused === true) {
+                this.videoDom.play();
+            }
+            this.videoDom.srcObject = evt.streams[0];
         };
         this.peerConnection.onicecandidate = (evt) => {
             if (evt.candidate) {
@@ -362,17 +379,17 @@ export default class CreateLink {
 
     _endPeerLink() {
         if (Check.checkDefined(this.peerConnection)) {
-            if (Check.checkDefined(this.viedeoDom)) {
-                if (this.viedeoDom.srcObject) {
-                    this.viedeoDom.pause();
-                    this.viedeoDom.srcObject.getTracks().forEach(track => {
+            if (Check.checkDefined(this.videoDom)) {
+                if (this.videoDom.srcObject) {
+                    this.videoDom.pause();
+                    this.videoDom.srcObject.getTracks().forEach(track => {
                         if (Check.checkDefined(track)) {
                             track.stop();
                         }
                     });
                 }
-                this.parentDom.removeChild(this.viedeoDom);
-                this.viedeoDom = null;
+                this.parentDom.removeChild(this.videoDom);
+                this.videoDom = null;
             }
             this.peerConnection.ontrack = null;
             this.peerConnection.onicecandidate = null;
@@ -390,11 +407,14 @@ export default class CreateLink {
             this.peerConnection.close();
             this.peerConnection = null;
 
-            this._sendToServer({
-                name: this.adminName,
-                target: this.connectPeer,
-                type: "hang-up"
-            });
+            if (this.connectPeer) {
+                this._sendToServer({
+                    name: this.adminName,
+                    target: this.connectPeer,
+                    type: "hang-up"
+                });
+                this.connectPeer = null;
+            }
         }
     }
 
@@ -407,6 +427,18 @@ export default class CreateLink {
         return this;
     }
 
+    setOnGeoLocationChange(onGeoLocationChange) {
+        this.onGeoLocationChange = Check.checkDefined(onGeoLocationChange) ? onGeoLocationChange : () => {
+        };
+        return this;
+    }
+
+    setOnInvite(onInvite) {
+        this.onInvite = Check.checkDefined(onInvite) ? onInvite : () => {
+        };
+        return this;
+    }
+
     setProtocols(protocols) {
         this.protocols = Check.checkDefined(protocols) ? protocols : "json";
         return this;
@@ -414,6 +446,12 @@ export default class CreateLink {
 
     setOnopen(onopen) {
         this.onopen = Check.checkDefined(onopen) ? onopen : () => {
+        };
+        return this;
+    }
+
+    setOnConnection(onConnection) {
+        this.onConnection = Check.checkDefined(onConnection) ? onConnection : () => {
         };
         return this;
     }
