@@ -112,9 +112,9 @@ const deCoder = new TextDecoder("utf-8");
 const max = 255;
 
 class NetLinkUtil {
-    static createSocket(serverUrl, protocols) {
+    static createSocket(serverUrl, protocols, needSSl) {
         let scheme = "ws";
-        if (document.location.protocol === "https:") {
+        if (needSSl === true) {
             scheme += "s";
         }
         serverUrl = scheme + "://" + serverUrl;
@@ -170,10 +170,10 @@ export default class CreateLink {
             case "userlist":
                 break;
             case "iceConfig":
-                this.iceConfig = data.data;
+                this.iceConfig = msg.data;
                 break;
             case "id":
-                this.id = data.id;
+                this.id = msg.id;
                 if (!this.iceConfig) {
                     this._sendToServer({
                         type: "loadICEConfig",
@@ -250,9 +250,7 @@ export default class CreateLink {
             return;
         }
         let desc = new RTCSessionDescription(msg.sdp);
-        await this.peerConnection.setRemoteDescription(desc).then(() => {
-            this.onConnection();
-        }).catch((error) => {
+        await this.peerConnection.setRemoteDescription(desc).catch((error) => {
             this.onerror(error)
         });
     }
@@ -273,7 +271,7 @@ export default class CreateLink {
         if (Check.checkDefined(this.webSocket)) {
             return;
         }
-        this.webSocket = NetLinkUtil.createSocket(this.url, this.protocols);
+        this.webSocket = NetLinkUtil.createSocket(this.url, this.protocols, this.needSSL);
 
         this.webSocket.onclose = () => {
             this.deActiveSocket();
@@ -333,24 +331,24 @@ export default class CreateLink {
 
         this.videoDom = window.document.createElement("video");
 
-        this.videoDom.autoplay = true;
+        // this.videoDom.autoplay = true;
+        // this.videoDom.muted = true;
+        this.videoDom.crossOrigin = "*";
 
-        this.videoDom.height = 200;
-        this.videoDom.width = 300;
+        this.videoDom.height = 400;
+        this.videoDom.width = 600;
 
-        this.videoDom.style.display = "none";
+        this.videoDom.style.display = "block";
         this.videoDom.style.position = "absolute";
-        this.videoDom.style.height = "200px";
-        this.videoDom.style.width = "300px";
+        this.videoDom.style.height = "400px";
+        this.videoDom.style.width = "600px";
+        // this.videoDom.style.top = "0";
+
+        this.parentDom.appendChild(this.videoDom);
 
         this.peerConnection = NetLinkUtil.createPeerConnection(this.iceConfig);
 
-        this.peerConnection.ontrack = (evt) => {
-            if (this.videoDom.paused === true) {
-                this.videoDom.play();
-            }
-            this.videoDom.srcObject = evt.streams[0];
-        };
+        this.peerConnection.ontrack = this.ontrack;
         this.peerConnection.onicecandidate = (evt) => {
             if (evt.candidate) {
                 this._sendToServer({
@@ -380,6 +378,8 @@ export default class CreateLink {
             // myPeerConnection.iceGatheringState;
         };
         this.peerConnection.onnegotiationneeded = this._handleNegotiationNeededEvent;
+
+        // this.onConnection();
     }
 
     _endPeerLink() {
@@ -388,7 +388,7 @@ export default class CreateLink {
                 if (this.videoDom.srcObject) {
                     this.videoDom.pause();
                     this.videoDom.srcObject.getTracks().forEach(track => {
-                        if (Check.checkDefined(track)) {
+                        if (Check.checkDefined(track) && track.stop) {
                             track.stop();
                         }
                     });
@@ -404,7 +404,7 @@ export default class CreateLink {
             this.peerConnection.onnegotiationneeded = null;
 
             this.peerConnection.getTransceivers().forEach(transceiver => {
-                if (Check.checkDefined(transceiver)) {
+                if (Check.checkDefined(transceiver) && transceiver.stop) {
                     transceiver.stop();
                 }
             });
@@ -432,6 +432,11 @@ export default class CreateLink {
         return this;
     }
 
+    setNeedSSL(needSSL) {
+        this.needSSL = needSSL === true;
+        return this;
+    }
+
     setOnGeoLocationChange(onGeoLocationChange) {
         this.onGeoLocationChange = Check.checkDefined(onGeoLocationChange) ? onGeoLocationChange : () => {
         };
@@ -451,6 +456,12 @@ export default class CreateLink {
 
     setOnopen(onopen) {
         this.onopen = Check.checkDefined(onopen) ? onopen : () => {
+        };
+        return this;
+    }
+
+    setOntrack(ontrack) {
+        this.ontrack = Check.checkDefined(ontrack) ? ontrack : () => {
         };
         return this;
     }
