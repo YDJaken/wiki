@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head>
+    <title>Demo</title>
+    <meta charset="utf-8">
+    <link href="chat.css" rel="stylesheet">
+    <link href="shared.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <div class="infobox">
+        <p>Enter a username: <input id="name" type="text" maxlength="12" required autocomplete="username"
+                                    inputmode="verbatim" placeholder="Username">
+            <input type="button" name="login" value="Log in" onclick="connect()"></p>
+    </div>
+    <ul class="userlistbox"></ul>
+    <div class="camerabox">
+        <video id="received_video" autoplay></video>
+        <video id="local_video" autoplay muted></video>
+        <button id="hangup-button" onclick="hangUpCall();" role="button" disabled>
+            Hang Up
+        </button>
+    </div>
+    <div class="empty-container"></div>
+    <script src="adapter.js"></script>
+    <script type="module" src="./chatclient.min.js"></script>
+</div>
+</body>
+</html>

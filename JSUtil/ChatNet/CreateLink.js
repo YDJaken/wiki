@@ -167,6 +167,9 @@ export default class CreateLink {
             case "geoLocation":
                 this.onGeoLocationChange(msg);
                 break;
+            case "orientation":
+                this.onOrientationChange(msg);
+                break;
             case "userlist":
                 break;
             case "iceConfig":
@@ -251,6 +254,7 @@ export default class CreateLink {
         }
         let desc = new RTCSessionDescription(msg.sdp);
         await this.peerConnection.setRemoteDescription(desc).catch((error) => {
+            this._endPeerLink();
             this.onerror(error)
         });
     }
@@ -320,6 +324,7 @@ export default class CreateLink {
                 sdp: this.peerConnection.localDescription
             });
         } catch (err) {
+            this._endPeerLink();
             this.onerror(err);
         }
     }
@@ -338,7 +343,7 @@ export default class CreateLink {
         this.videoDom.height = 400;
         this.videoDom.width = 600;
 
-        this.videoDom.style.display = "block";
+        this.videoDom.style.display = "none";
         this.videoDom.style.position = "absolute";
         this.videoDom.style.height = "400px";
         this.videoDom.style.width = "600px";
@@ -420,6 +425,8 @@ export default class CreateLink {
                 });
                 this.connectPeer = null;
             }
+
+            this.onEndConnection(this);
         }
     }
 
@@ -439,6 +446,12 @@ export default class CreateLink {
 
     setOnGeoLocationChange(onGeoLocationChange) {
         this.onGeoLocationChange = Check.checkDefined(onGeoLocationChange) ? onGeoLocationChange : () => {
+        };
+        return this;
+    }
+
+    setOnOrientationChange(onOrientationChange) {
+        this.onOrientationChange = Check.checkDefined(onOrientationChange) ? onOrientationChange : () => {
         };
         return this;
     }
@@ -463,6 +476,12 @@ export default class CreateLink {
     setOntrack(ontrack) {
         this.ontrack = Check.checkDefined(ontrack) ? ontrack : () => {
         };
+        return this;
+    }
+
+    setOnEndConnection(onEndConnection) {
+        this.onEndConnection = Check.checkDefined(onEndConnection) ? onEndConnection : () => {
+        }
         return this;
     }
 
