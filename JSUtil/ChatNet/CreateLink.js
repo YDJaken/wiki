@@ -336,8 +336,6 @@ export default class CreateLink {
 
         this.videoDom = window.document.createElement("video");
 
-        // this.videoDom.autoplay = true;
-        // this.videoDom.muted = true;
         this.videoDom.crossOrigin = "*";
 
         this.videoDom.height = 400;
@@ -347,7 +345,6 @@ export default class CreateLink {
         this.videoDom.style.position = "absolute";
         this.videoDom.style.height = "400px";
         this.videoDom.style.width = "600px";
-        // this.videoDom.style.top = "0";
 
         this.parentDom.appendChild(this.videoDom);
 
@@ -383,8 +380,6 @@ export default class CreateLink {
             // myPeerConnection.iceGatheringState;
         };
         this.peerConnection.onnegotiationneeded = this._handleNegotiationNeededEvent;
-
-        // this.onConnection();
     }
 
     _endPeerLink() {
