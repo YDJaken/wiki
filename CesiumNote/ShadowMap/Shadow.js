@@ -82,9 +82,11 @@ export default class Shadow {
             enabled: this.viewer.shadows,
             cascadesEnabled: false
         };
+        this.videoDom = obj.videoDom;
+
         this.tmp_Texture = new dependencies.Cesium.Texture({
             context: this.viewer.scene.context,
-            source: document.getElementById('video')
+            source: this.videoDom
         });
 
         let aimmer = () => {
@@ -154,8 +156,11 @@ export default class Shadow {
                 }
                 this.tmp_Texture = new dependencies.Cesium.Texture({
                     context: this.viewer.scene.context,
-                    source: document.getElementById('video')
+                    source: this.videoDom
                 });
+                if (Check.function(this.position)) {
+                    this.camera.position = Coordinate.handlePosition(this.position);
+                }
                 origin.call(this.shadowMap, frameState);
                 // debugger
             }
@@ -417,13 +422,14 @@ export default class Shadow {
 
     setPosition(position) {
         if (!Check.checkDefined(position)) return this;
+        this.position = position;
 
         if (this.center) {
-            let tmpPosition = Coordinate.handlePosition(position);
+            let tmpPosition = Coordinate.handlePosition(this.position);
             let range = dependencies.Cesium.Cartesian3.distance(tmpPosition, this.center);
             this.camera.lookAt(this.center, new dependencies.Cesium.HeadingPitchRange(this.heading, this.pitch, range));
         } else {
-            this.camera.position = Coordinate.handlePosition(position);
+            this.camera.position = Coordinate.handlePosition(this.position);
         }
         if (this.frustum) {
             this.creatFrustum();
