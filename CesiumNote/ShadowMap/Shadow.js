@@ -161,6 +161,9 @@ export default class Shadow {
                 if (Check.function(this.position)) {
                     this.camera.position = Coordinate.handlePosition(this.position);
                 }
+                if (this.frustum) {
+                    this.creatFrustum();
+                }
                 origin.call(this.shadowMap, frameState);
                 // debugger
             }
@@ -283,9 +286,7 @@ export default class Shadow {
     set fov(fov) {
         if (!Check.checkDefined(this.camera) || !Check.checkDefined(this.camera.frustum)) return;
         this.camera.frustum.fov = fov;
-        if (this.frustum) {
-            this.creatFrustum();
-        }
+
     }
 
     get fov() {
@@ -296,9 +297,7 @@ export default class Shadow {
     set aspectRatio(aspectRatio) {
         if (!Check.checkDefined(this.camera) || !Check.checkDefined(this.camera.frustum)) return;
         this.camera.frustum.aspectRatio = aspectRatio;
-        if (this.frustum) {
-            this.creatFrustum();
-        }
+
     }
 
     get aspectRatio() {
@@ -315,9 +314,7 @@ export default class Shadow {
                 roll: this.roll
             }
         });
-        if (this.frustum) {
-            this.creatFrustum();
-        }
+
     }
 
     get heading() {
@@ -334,9 +331,7 @@ export default class Shadow {
                 roll: this.roll
             }
         });
-        if (this.frustum) {
-            this.creatFrustum();
-        }
+
     }
 
     get pitch() {
@@ -353,9 +348,7 @@ export default class Shadow {
                 roll: Coordinate.angleToRadian(roll)
             }
         });
-        if (this.frustum) {
-            this.creatFrustum();
-        }
+
     }
 
     get roll() {
@@ -372,9 +365,7 @@ export default class Shadow {
         }
         this.camera.frustum.far = far;
         this.shadowMap.maximumDistance = far;
-        if (this.frustum) {
-            this.creatFrustum();
-        }
+
     }
 
     get far() {
@@ -389,9 +380,7 @@ export default class Shadow {
             near = this.far - 1;
         }
         this.camera.frustum.near = near;
-        if (this.frustum) {
-            this.creatFrustum();
-        }
+
     }
 
     get near() {
@@ -414,9 +403,7 @@ export default class Shadow {
         this.center = Coordinate.handlePosition(center);
         let range = dependencies.Cesium.Cartesian3.distance(this.camera.positionWC, this.center);
         this.camera.lookAt(this.center, new dependencies.Cesium.HeadingPitchRange(this.heading, this.pitch, range));
-        if (this.frustum) {
-            this.creatFrustum();
-        }
+
         return this;
     }
 
@@ -431,9 +418,7 @@ export default class Shadow {
         } else {
             this.camera.position = Coordinate.handlePosition(this.position);
         }
-        if (this.frustum) {
-            this.creatFrustum();
-        }
+
         return this;
     }
 
