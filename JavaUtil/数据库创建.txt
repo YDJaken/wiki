@@ -1,0 +1,204 @@
+-- 创建数据库
+CREATE DATABASE gis;
+CREATE EXTENSION postgis; CREATE EXTENSION hstore;
+
+
+-- 创建 population_migration
+
+-- DROP TABLE public.population_migration;
+
+CREATE TABLE public.population_migration
+(
+    "OriginCode" text,
+    "OriginName" text,
+    "DestinationCode" text,
+    "DestinationName" text,
+    "time" timestamp without time zone,
+    value double precision,
+    "dataLevel" text,
+    "type" boolean
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE public.population_migration
+    OWNER to postgres;
+
+-- 创建铁路路线表
+
+CREATE TABLE public."railWayLines"
+(
+    way geometry,
+    name character text
+);
+
+ALTER TABLE public."railWayLines"
+    OWNER to postgres;
+
+-- 创建高速路线表
+CREATE TABLE public."highWayLines"
+(
+    way geometry,
+    name character text
+);
+
+ALTER TABLE public."highWayLines"
+    OWNER to postgres;
+
+-- 创建水路路线表
+CREATE TABLE public."waterWayLines"
+(
+    way geometry,
+    name character text
+);
+
+ALTER TABLE public."waterWayLines"
+    OWNER to postgres;
+
+--创建POI表格
+CREATE TABLE public."poiPoints"
+(
+    way geometry,
+    name text
+);
+
+ALTER TABLE public."poiPoints"
+    OWNER to postgres;
+
+-- 创建合并函数
+-- 铁路
+DROP FUNCTION "MakeRailWayLineString"();
+CREATE OR REPLACE FUNCTION "MakeRailWayLineString"()
+     RETURNS geometry[] as $$
+ 		DECLARE  
+ 			railNameData text[];
+			geoData geometry[];
+			tmpGeoData geometry[];
+			tmpGeoData2 geometry;
+			ii integer := 1;
+			arraylength integer :=0;
+ 		BEGIN
+ 			railNameData = array(SELECT "name" FROM public.planet_osm_roads where railway = 'rail' AND "name" IS NOT NULL GROUP BY planet_osm_roads.name);
+			
+			arraylength = array_length(railNameData,1);
+			while ii <= arraylength loop
+				tmpGeoData = array(SELECT "way" FROM public.planet_osm_roads where railway = 'rail' AND "name" = railNameData[ii]);
+				tmpGeoData2 = ST_Transform(ST_LineMerge(ST_Union(tmpGeoData)),4326);
+				INSERT INTO public."railWayLines" VALUES(tmpGeoData2,railNameData[ii]);
+				geoData = array_append(geoData,tmpGeoData2);
+				ii = ii+1;
+			END LOOP;
+			
+ 			RETURN geoData;
+ 		END;
+ 		$$ LANGUAGE plpgsql;
+
+SELECT public."MakeRailWayLineString"();
+SELECT * from public."railWayLines";
+-- 高速公路
+DROP FUNCTION "MakeHighWayLineString"();
+CREATE OR REPLACE FUNCTION "MakeHighWayLineString"()
+     RETURNS geometry[] as $$
+ 		DECLARE  
+ 			railNameData text[];
+			geoData geometry[];
+			tmpGeoData geometry[];
+			tmpGeoData2 geometry;
+			ii integer := 1;
+			arraylength integer :=0;
+ 		BEGIN
+ 			railNameData = array(SELECT "name" FROM public.planet_osm_roads where highway IN ('motorway','trunk','primary') AND "name" IS NOT NULL GROUP BY planet_osm_roads.name);
+			
+			arraylength = array_length(railNameData,1);
+			while ii <= arraylength loop
+				tmpGeoData = array(SELECT "way" FROM public.planet_osm_roads where highway IN ('motorway','trunk','primary') AND "name" = railNameData[ii]);
+				tmpGeoData2 = ST_Transform(ST_LineMerge(ST_Union(tmpGeoData)),4326);
+				INSERT INTO public."highWayLines" VALUES(tmpGeoData2,railNameData[ii]);
+				geoData = array_append(geoData,tmpGeoData2);
+				ii = ii+1;
+			END LOOP;
+			
+ 			RETURN geoData;
+ 		END;
+ 		$$ LANGUAGE plpgsql;
+
+SELECT public."MakeHighWayLineString"();
+SELECT * from public."highWayLines";
+
+-- 水道
+DROP FUNCTION "MakeWaterWayLineString"();
+CREATE OR REPLACE FUNCTION "MakeWaterWayLineString"()
+     RETURNS geometry[] as $$
+ 		DECLARE  
+ 			railNameData text[];
+			geoData geometry[];
+			tmpGeoData geometry[];
+			tmpGeoData2 geometry;
+			ii integer := 1;
+			arraylength integer :=0;
+ 		BEGIN
+ 			railNameData = array(SELECT "name" FROM public.planet_osm_line where waterway ='river' AND "name" IS NOT NULL GROUP BY planet_osm_line.name);
+			
+			arraylength = array_length(railNameData,1);
+			while ii <= arraylength loop
+				tmpGeoData = array(SELECT "way" FROM public.planet_osm_line where waterway ='river' AND "name" = railNameData[ii]);
+ 				tmpGeoData2 = ST_Transform(ST_LineMerge(ST_Union(tmpGeoData)),4326);
+ 				INSERT INTO public."waterWayLines" VALUES(tmpGeoData2,railNameData[ii]);
+				geoData = array_append(geoData,tmpGeoData2);
+				ii = ii+1;
+			END LOOP;
+			
+ 			RETURN geoData;
+ 		END;
+ 		$$ LANGUAGE plpgsql;
+
+SELECT public."MakeWaterWayLineString"();
+SELECT * from public."waterWayLines";
+
+-- poi点
+DROP FUNCTION "MakePoiPoints"();
+CREATE OR REPLACE FUNCTION "MakePoiPoints"()
+     RETURNS geometry[] as $$
+ 		DECLARE  
+ 			railNameData text[];
+			geoData geometry[];
+			tmpGeoData geometry[];
+			tmpGeoData2 geometry;
+			ii integer := 1;
+			arraylength integer :=0;
+ 		BEGIN
+ 			railNameData = array(SELECT "name" FROM public.planet_osm_point where "name" is not NULL group BY "name");
+			
+			arraylength = array_length(railNameData,1);
+			while ii <= arraylength loop
+				tmpGeoData = array(SELECT "way" FROM public.planet_osm_point where "name" = railNameData[ii]);
+ 				tmpGeoData2 = ST_Transform(tmpGeoData[1],4326);
+ 				INSERT INTO public."poiPoints" VALUES(tmpGeoData2,railNameData[ii]);
+				geoData = array_append(geoData,tmpGeoData2);
+				ii = ii+1;
+			END LOOP;
+			
+ 			RETURN geoData;
+ 		END;
+ 		$$ LANGUAGE plpgsql;
+
+-- 执行函数
+-- 铁路
+DELETE from public."railWayLines";
+SELECT public."MakeRailWayLineString"();
+SELECT * from public."railWayLines";
+
+-- 高速公路
+DELETE from public."highWayLines";
+SELECT public."MakeHighWayLineString"();
+SELECT * from public."highWayLines";
+
+-- 水道
+DELETE from public."waterWayLines";
+SELECT public."MakeWaterWayLineString"();
+SELECT * from public."waterWayLines";
+
+-- poi
+DELETE from public."poiPoints";
+SELECT public."MakePoiPoints"();
+SELECT * from public."poiPoints";
