@@ -172,56 +172,91 @@ class Solution {
 	}
 
 	/*
-    	 * 给定一个字符串，逐个翻转字符串中的每个单词。 示例 1：
-    	 *
-    	 * 输入: "the sky is blue" 输出: "blue is sky the" 示例 2：
-    	 *
-    	 * 输入: "  hello world!  " 输出: "world! hello" 解释:
-    	 * 输入字符串可以在前面或者后面包含多余的空格，但是反转后的字符不能包括。 示例 3：
-    	 *
-    	 * 输入: "a good   example" 输出: "example good a" 解释:
-    	 * 如果两个单词间有多余的空格，将反转后单词间的空格减少到只含一个。  
-    	 *
-    	 * 说明：
-    	 *
-    	 * 无空格字符构成一个单词。 输入字符串可以在前面或者后面包含多余的空格，但是反转后的字符不能包括。
-    	 * 如果两个单词间有多余的空格，将反转后单词间的空格减少到只含一个。  
-    	 *
-    	 * 进阶：
-    	 *
-    	 * 请选用 C 语言的用户尝试使用 O(1) 额外空间复杂度的原地解法。
-    	 *
-    	 * 来源：力扣（LeetCode） 链接：https://leetcode-cn.com/problems/reverse-words-in-a-string
-    	 * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
-    	 */
-    	static final char testCase = ' ';
+     * 给定一个字符串，逐个翻转字符串中的每个单词。 示例 1：
+     *
+     * 输入: "the sky is blue" 输出: "blue is sky the" 示例 2：
+     *
+     * 输入: "  hello world!  " 输出: "world! hello" 解释:
+     * 输入字符串可以在前面或者后面包含多余的空格，但是反转后的字符不能包括。 示例 3：
+     *
+     * 输入: "a good   example" 输出: "example good a" 解释:
+     * 如果两个单词间有多余的空格，将反转后单词间的空格减少到只含一个。  
+     *
+     * 说明：
+     *
+     * 无空格字符构成一个单词。 输入字符串可以在前面或者后面包含多余的空格，但是反转后的字符不能包括。
+     * 如果两个单词间有多余的空格，将反转后单词间的空格减少到只含一个。  
+     *
+     * 进阶：
+     *
+     * 请选用 C 语言的用户尝试使用 O(1) 额外空间复杂度的原地解法。
+     *
+     * 来源：力扣（LeetCode） 链接：https://leetcode-cn.com/problems/reverse-words-in-a-string
+     * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+     */
+    static final char testCase = ' ';
 
-    	public String reverseWords(String s) {
-        		int n = s.length();
-        		LinkedList<String> strs = new LinkedList<String>();
-        		StringBuilder sb = new StringBuilder();
-        		for (int i = 0; i < n; i++) {
-        			char target = s.charAt(i);
-        			if (target == testCase) {
-        				if (sb.length() > 0) {
-        					strs.add(sb.toString());
-        					sb.setLength(0);
-        				}
-        			} else {
-        				sb.append(target);
+    public String reverseWords(String s) {
+        	int n = s.length();
+        	LinkedList<String> strs = new LinkedList<String>();
+        	StringBuilder sb = new StringBuilder();
+        	for (int i = 0; i < n; i++) {
+        		char target = s.charAt(i);
+        		if (target == testCase) {
+        			if (sb.length() > 0) {
+        				strs.add(sb.toString());
+        				sb.setLength(0);
         			}
+        		} else {
+        			sb.append(target);
         		}
-        		if (sb.length() > 0) {
-        			strs.add(sb.toString());
-        			sb.setLength(0);
-        		}
-        		while (strs.size() > 0) {
-        			sb.append(strs.removeLast());
-        			sb.append(testCase);
-        		}
+        	}
+        	if (sb.length() > 0) {
+        		strs.add(sb.toString());
+        		sb.setLength(0);
+        	}
+        	while (strs.size() > 0) {
+        		sb.append(strs.removeLast());
+        		sb.append(testCase);
+        	}
+        	return sb.toString().trim();
+    }
 
-        		return sb.toString().trim();
-        }
+    /*
+	 * 统计字符串中的单词个数，这里的单词指的是连续的不是空格的字符。
+	 *
+	 * 请注意，你可以假定字符串里不包括任何不可打印的字符。
+	 *
+	 * 示例:
+	 *
+	 * 输入: "Hello, my name is John" 输出: 5 解释: 这里的单词是指连续的不是空格的字符，所以 "Hello," 算作 1
+	 * 个单词。
+	 *
+	 * 来源：力扣（LeetCode）
+	 * 链接：https://leetcode-cn.com/problems/number-of-segments-in-a-string
+	 * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+	 */
+	static final char testCase = ' ';
+	public int countSegments(String s) {
+		int size = s.length();
+		int count = 0,step = 0;
+		for (int i = 0; i < size; i++) {
+			char target = s.charAt(i);
+			if (target == testCase) {
+				if (step > 0) {
+					count++;
+					step = 0;
+				}
+			} else {
+				step++;
+			}
+		}
+		if (step > 0) {
+			count++;
+			step = 0;
+		}
+		return count;
+    }
 
 
 	/*
@@ -267,6 +302,101 @@ class Solution {
 		}
 
 		return size;
+	}
+
+    /*
+	 * 编写一个函数来查找字符串数组中的最长公共前缀。
+	 *
+	 * 如果不存在公共前缀，返回空字符串 ""。
+	 *
+	 * 示例 1:
+	 *
+	 * 输入: ["flower","flow","flight"] 输出: "fl" 示例 2:
+	 *
+	 * 输入: ["dog","racecar","car"] 输出: "" 解释: 输入不存在公共前缀。 说明:
+	 *
+	 * 所有输入只包含小写字母 a-z 。
+	 *
+	 * 来源：力扣（LeetCode） 链接：https://leetcode-cn.com/problems/longest-common-prefix
+	 * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+	 */
+
+	public String longestCommonPrefix(String[] strs) {
+		if (strs.length < 2) {
+			try {
+				return strs[0];
+			} catch (Exception e) {
+				return "";
+			}
+		}
+		String first = strs[0];
+		String second = strs[1];
+		StringBuilder sb = new StringBuilder();
+		int length = Math.min(first.length(), second.length());
+		for (int i = 0; i < length; i++) {
+			if (first.charAt(i) == second.charAt(i)) {
+				sb.append(first.charAt(i));
+			} else {
+				break;
+			}
+		}
+		length = strs.length;
+		for (int i = 2; i < length; i++) {
+			int stSize = sb.length();
+			if (stSize == 0) {
+				return "";
+			}
+			if(stSize > strs[i].length()) {
+				stSize = strs[i].length();
+				sb.setLength(stSize);
+			}
+			for (int j = stSize - 1; j >= 0; j--) {
+				if(sb.charAt(j) != strs[i].charAt(j)) {
+					sb.setLength(j);
+				}
+			}
+		}
+		return sb.toString();
+	}
+
+    /*
+	 * 给定一个整数数组，你需要寻找一个连续的子数组，如果对这个子数组进行升序排序，那么整个数组都会变为升序排序。
+	 *
+	 * 你找到的子数组应是最短的，请输出它的长度。
+	 *
+	 * 示例 1:
+	 *
+	 * 输入: [2, 6, 4, 8, 10, 9, 15] 输出: 5 解释: 你只需要对 [6, 4, 8, 10, 9]
+	 * 进行升序排序，那么整个表都会变为升序排序。 说明 :
+	 *
+	 * 输入的数组长度范围在 [1, 10,000]。 输入的数组可能包含重复元素 ，所以升序的意思是<=。
+	 *
+	 * 来源：力扣（LeetCode）
+	 * 链接：https://leetcode-cn.com/problems/shortest-unsorted-continuous-subarray
+	 * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+	 */
+	/*
+	 * 題目要求只寻找一个连续子数组 故数组内只有一段乱序数组 双指针遍历
+	 */
+	public int findUnsortedSubarray(int[] nums) {
+		int size = nums.length, last = size - 1;
+		int start = 0, end = -1, max = nums[0], min = nums[last];
+		for (int i = 0; i < size; i++) {
+			int target = nums[i];
+			if (target < max) {
+				end = i;
+			} else {
+				max = target;
+			}
+			target = nums[last - i];
+			if (target > min) {
+				start = last - i;
+			} else {
+				min = target;
+			}
+		}
+
+		return end - start + 1;
 	}
 
 	public String convert(String s, int numRows) {
