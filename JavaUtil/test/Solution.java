@@ -141,6 +141,85 @@ class Solution {
 	}
 
     /*
+	 * 给定一个整数数组 nums ，小李想将 nums 切割成若干个非空子数组，使得每个子数组最左边的数和最右边的数的最大公约数大于 1
+	 * 。为了减少他的工作量，请求出最少可以切成多少个子数组。
+	 *
+	 * 示例 1：
+	 *
+	 * 输入：nums = [2,3,3,2,3,3]
+	 *
+	 * 输出：2
+	 *
+	 * 解释：最优切割为 [2,3,3,2] 和 [3,3] 。第一个子数组头尾数字的最大公约数为 2 ，第二个子数组头尾数字的最大公约数为 3 。
+	 *
+	 * 示例 2：
+	 *
+	 * 输入：nums = [2,3,5,7]
+	 *
+	 * 输出：4
+	 *
+	 * 解释：只有一种可行的切割：[2], [3], [5], [7]
+	 *
+	 * 限制：
+	 *
+	 * 1 <= nums.length <= 10^5 2 <= nums[i] <= 10^6
+	 *
+	 * 来源：力扣（LeetCode） 链接：https://leetcode-cn.com/problems/qie-fen-shu-zu
+	 * 著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。
+	 */
+
+	 static int[] primes;
+
+	    static {
+	        int maxN = 1_000_000;
+	        int limit = 1_000;
+	        primes = new int[maxN + 1];
+	        for (int i = 2; i <=maxN; i+=2) {
+	            primes[i] = 2;
+	        }
+
+
+	        for (int i = 3; i <=maxN; i += 2) {
+	            if (primes[i] > 0) {
+	                continue;
+	            }
+	            primes[i] = i;
+	            if (i > limit) {
+	                continue;
+	            }
+	            for (int j = i * i; j <=maxN; j+= i) {
+	                primes[j] = i;
+	            }
+	        }
+	    }
+
+	    public int splitArray(int[] nums) {
+	        int max = 0;
+	        for (int num : nums) {
+	            max = Math.max(num, max);
+	        }
+
+
+	        int pre = 0;
+	        int[] f = new int[max + 1];
+	        for (int i = 0; i < f.length; i++) {
+	            f[i] = f.length;
+	        }
+
+	        for (int num : nums) {
+	            max = primes.length;
+	            while (num > 1) {
+	                int check = primes[num];
+	                num /= check;
+	                f[check] = Math.min(f[check], pre + 1);
+	                max = Math.min(max, f[check]);
+	            }
+	            pre = max;
+	        }
+	        return pre;
+	    }
+
+    /*
 	 * For strings S and T, we say "T divides S" if and only if S = T + ... + T  (T
 	 * concatenated with itself 1 or more times)
 	 *
