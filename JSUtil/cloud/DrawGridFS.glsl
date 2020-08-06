@@ -23,13 +23,15 @@ void main()
     materialInput.st = v_st;
     czm_material material = czm_getMaterial(materialInput);
 
-    material.diffuse = vec3(v_lonlat.w);
-    material.alpha = v_lonlat.w * 1.2;
+    material.diffuse = vec3(1.);
+    material.alpha = v_lonlat.w * 0.9 + 0.05;
 //    material.alpha = 0.75;
 
-    #ifdef FLAT
-    gl_FragColor = vec4(material.diffuse + material.emission, material.alpha);
-    #else
-    gl_FragColor = czm_phong(normalize(positionToEyeEC), material, czm_lightDirectionEC);
-    #endif
+    gl_FragColor = vec4(material.diffuse, material.alpha);
+
+//    #ifdef FLAT
+//    gl_FragColor = vec4(material.diffuse + material.emission, material.alpha);
+//    #else
+//    gl_FragColor = czm_phong(normalize(positionToEyeEC), material, czm_lightDirectionEC);
+//    #endif
 }
