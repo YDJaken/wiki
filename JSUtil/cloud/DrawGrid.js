@@ -1,11 +1,11 @@
 import ObjectUtil from "@/despUtil/Util/ObjectUtil";
 import Check from "@/despUtil/Util/Check";
 import {dependencies, despDefaultColorArray} from "@/despCore/Constants";
-import DrawGridVS from "../shader/DrawGridVS.glsl";
-import DrawGridFS from "../shader/DrawGridFS.glsl";
+import {DrawGridVS, DrawGridFS} from "../shader/main";
 import Coordinate from "@/despCore/Math/Coordinate";
 import MovePrimitive from "@/despCore/Primitive/MovePrimitive";
 import MRectangle from "@/despCore/Math/Rectangle";
+import loadToString from "@/despUtil/Util/loadToString";
 
 /**
  * @author DY
@@ -19,7 +19,18 @@ export default class DrawGrid {
 
         this.setProperty(obj);
 
+        this.time = 0.0;
+
         this._generateIndex();
+    }
+
+    applyTime(time) {
+        if (time < 0.0) {
+            time = 0.0;
+        } else if (time > 1.0) {
+            time = 1.0;
+        }
+        this.time = time;
     }
 
     _generateIndex() {
@@ -34,12 +45,6 @@ export default class DrawGrid {
             rectangle = MRectangle.fromArrayD([this.originX, this.originY, this.originX + xLength, this.originY + yLength]);
         }
 
-        let tmpGeo = dependencies.Cesium.RectangleGeometry.createGeometry(new dependencies.Cesium.RectangleGeometry({
-            rectangle: rectangle,
-            granularity: interval,
-            vertexFormat: dependencies.Cesium.VertexFormat.POSITION_AND_ST
-        }));
-
         let geometry = new dependencies.Cesium.GeometryInstance({
             geometry: new dependencies.Cesium.RectangleGeometry({
                 rectangle: rectangle,
@@ -47,52 +52,99 @@ export default class DrawGrid {
                 vertexFormat: dependencies.Cesium.VertexFormat.POSITION_AND_ST
             })
         });
+
+        let fabric = {
+            fabric: {
+                type: "Image",
+                uniforms: {}
+            }
+        };
+
+        fabric.fabric.uniforms["origin"] = {
+            x: Coordinate.angleToRadian(this.originX),
+            y: Coordinate.angleToRadian(this.originY)
+        };
+
+        fabric.fabric.uniforms["interval"] = {
+            x: Coordinate.angleToRadian(this.xInterval),
+            y: Coordinate.angleToRadian(this.yInterval)
+        };
+
+        fabric.fabric.uniforms["gridSize"] = {x: this.xGridSize, y: this.yGridSize};
+
+        fabric.fabric.uniforms["controlNumber"] = {
+            x: this.minHeight,
+            y: this.maxHeight,
+            z: this.min,
+            w: this.max
+        };
+
+        let addStr = "";
+        let addStr2 = "";
+        fabric.fabric.uniforms["time"] = this.time;
+
+        if (!Check.Array(this.data)) {
+            fabric.fabric.uniforms["image"] = this.data;
+            addStr += "uniform sampler2D image_5;"
+            addStr2 += `vec4 getCurrentColor(in float time, in vec2 frac){return texture2D(image_5,frac);}`
+            addStr2 += `vec4 getNextColor(in float time, in vec2 frac){return texture2D(image_5,frac);}`
+            addStr2 += `float getStep(in float time){return 0.;}`
+        } else {
+            for (let i = 0; i < this.data.length; i++) {
+                fabric.fabric.uniforms["image_" + i] = this.data[i];
+                addStr += `uniform sampler2D image_${i}_${5 + i};`
+            }
+            addStr2 += `vec4 getCurrentColor(in float time, in vec2 frac){${this._loadShader(this.data.length, 0)}}`;
+            addStr2 += `vec4 getNextColor(in float time, in vec2 frac){${this._loadShader(this.data.length, 1)}}`;
+            // addStr2 += `float getStep(in float time){${this._loadShader(this.data.length, 2)}}`;
+            addStr2 += `float getStep(in float time){return 0.;}`;
+        }
+
         this.primitive = new dependencies.Cesium.Primitive({
             geometryInstances: geometry,
             show: this.show,
-            releaseGeometryInstances: false,
-            asynchronous: false,
             appearance: new dependencies.Cesium.MaterialAppearance({
-                material: new dependencies.Cesium.Material({
-                    fabric: {
-                        type: "Image",
-                        uniforms: {
-                            image: this.data,
-                            origin: {
-                                x: Coordinate.angleToRadian(this.originX),
-                                y: Coordinate.angleToRadian(this.originY)
-                            },
-                            interval: {
-                                x: Coordinate.angleToRadian(this.xInterval),
-                                y: Coordinate.angleToRadian(this.yInterval)
-                            },
-                            gridSize: {x: this.xGridSize, y: this.yGridSize},
-                            controlNumber:{
-                                x: this.minHeight,
-                                y: this.maxHeight,
-                                z: this.min,
-                                w: this.max
-                            }
-                        }
-                    }
-                }),
-                fragmentShaderSource: this.fragmentShaderSource,
-                vertexShaderSource: this.vertexShaderSource,
+                material: new dependencies.Cesium.Material(fabric),
+                fragmentShaderSource: loadToString.toString(DrawGridFS),
+                vertexShaderSource: addStr + addStr2 +loadToString.toString(DrawGridVS),
                 aboveGround: true
             }),
             modelMatrix: MovePrimitive.Mat(),
         });
+
+        let origin = this.primitive.update;
+        this.primitive.update = (frameState) => {
+            this.primitive.appearance.material.uniforms['time'] = this.time;
+            origin.call(this.primitive, frameState);
+        }
+
         this.primitiveCollection.add(this.primitive);
     }
 
+    _loadShader(length, type) {
+        let str = `float count = time * ${length}.0;`
+        switch (type) {
+            case 0:
+                str += `count = floor(count);`
+                for (let i = 0; i < length; i++) {
+                    str += `if(count == ${i}.0){ return texture2D(image_${i}_${5 + i},frac);}`
+                }
+                break;
+            case 1:
+                str += `count = ceil(count);`
+                for (let i = 0; i < length; i++) {
+                    str += `if(count == ${i}.0){  return texture2D(image_${i}_${5 + i},frac);}`
+                }
+                break;
+            case 2:
+                str += `return fract(count);`
+                break;
+        }
+        return str;
+    }
+
     _reboundLon(lon) {
-        // if (lon > 180) {
-        //     return -180 + (lon - 180);
-        // } else if (lon < -180) {
-        //     return 180 + (lon + 180);
-        // } else {
         return lon;
-        // }
     }
 
     _reboundLat(lat) {
@@ -103,24 +155,14 @@ export default class DrawGrid {
         ObjectUtil.setProperties(this, obj);
     }
 
-    setMaxHeight(maxHeight){
-        this.maxHeight = Check.number(maxHeight)? maxHeight: 400000;
+    setMaxHeight(maxHeight) {
+        this.maxHeight = Check.number(maxHeight) ? maxHeight : 300000;
         return this;
     }
 
 
-    setMinHeight(minHeight){
-        this.minHeight = Check.number(minHeight)? minHeight: 100000;
-        return this;
-    }
-
-    setFragmentShaderSource(fragmentShaderSource) {
-        this.fragmentShaderSource = Check.checkDefined(fragmentShaderSource) ? fragmentShaderSource : DrawGridFS;
-        return this;
-    }
-
-    setVertexShaderSource(vertexShaderSource) {
-        this.vertexShaderSource = Check.checkDefined(vertexShaderSource) ? vertexShaderSource : DrawGridVS;
+    setMinHeight(minHeight) {
+        this.minHeight = Check.number(minHeight) ? minHeight : 200000;
         return this;
     }
 

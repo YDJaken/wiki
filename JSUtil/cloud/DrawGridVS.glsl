@@ -121,8 +121,7 @@ vec4 translateRelativeToEye(vec3 high, vec3 low){
     return vec4(highDifference + lowDifference, 1.0);
 }
 
-vec4 computePosition(in vec3 high, in vec3 low)
-{
+vec4 computePosition(in vec3 high, in vec3 low){
     vec4 p;
     p = translateRelativeToEye(high, low);
     return p;
@@ -163,8 +162,7 @@ vec4 lerpColor (in vec4 current, in vec4 next, in float step){
 }
 
 
-void main()
-{
+void main(){
     vec4 p = vec4(recover(), 0.);
 
     //    vec4 p = computePosition(position3DHigh,position3DLow);

@@ -1,251 +1,123 @@
-import ObjectUtil from "@/despUtil/Util/ObjectUtil";
-import Check from "@/despUtil/Util/Check";
-import {dependencies, despDefaultColorArray} from "@/despCore/Constants";
-import {DrawGridVS, DrawGridFS} from "../shader/main";
-import Coordinate from "@/despCore/Math/Coordinate";
-import MovePrimitive from "@/despCore/Primitive/MovePrimitive";
-import MRectangle from "@/despCore/Math/Rectangle";
-import loadToString from "@/despUtil/Util/loadToString";
-
 /**
- * @author DY
+ * @Author DY
  */
-export default class DrawGrid {
-    constructor(obj) {
-        if (!Check.checkDefined(obj.collection)) {
-            throw new Error("primitiveCollection is needed.");
-        }
-        this.primitiveCollection = obj.collection;
 
-        this.setProperty(obj);
+import Check from "../../despUtil/Util/Check";
+import GLUtil from "../../despUtil/Util/GLUtil";
+import EarthVS from "../shader/EarthVS.glsl";
+import EarthFS from "../shader/EarthFS.glsl";
+import {dependencies} from "@/despCore/Constants";
+import ObjectUtil from "../../despUtil/Util/ObjectUtil";
 
-        this.time = 0.0;
-
-        this._generateIndex();
-    }
-
-    applyTime(time) {
-        if (time < 0.0) {
-            time = 0.0;
-        } else if (time > 1.0) {
-            time = 1.0;
-        }
-        this.time = time;
-    }
-
-    _generateIndex() {
-        let interval = Math.min(Math.abs(this.xInterval), Math.abs(this.yInterval));
-        interval = Coordinate.angleToRadian(interval);
-        let xLength = this.xInterval * this.xGridSize;
-        let yLength = this.yInterval * this.yGridSize;
-        let rectangle;
-        if (Math.abs(xLength) >= 359 || Math.abs(yLength) >= 179) {
-            rectangle = MRectangle.getMaxRec();
-        } else {
-            rectangle = MRectangle.fromArrayD([this.originX, this.originY, this.originX + xLength, this.originY + yLength]);
+export default class DrawSphere {
+    constructor(obj = {}) {
+        if (!Check.checkDefined(obj.viewer)) {
+            throw new Error("viewer is needed.");
         }
 
-        let geometry = new dependencies.Cesium.GeometryInstance({
-            geometry: new dependencies.Cesium.RectangleGeometry({
-                rectangle: rectangle,
-                granularity: interval,
-                vertexFormat: dependencies.Cesium.VertexFormat.POSITION_AND_ST
-            })
+        this.viewer = obj.viewer;
+        this.gl = this.viewer.scene.context._gl;
+        this.context = this.viewer.scene.context;
+
+        this.EarthShader = GLUtil.createProgram(this.gl, EarthVS, EarthFS);
+
+        let radius = 6378400.0;
+        let arc = 256.0;
+        // 底层蒙皮的几何信息
+        this.earthGeo = new dependencies.Cesium.EllipsoidGeometry({
+            radii: new dependencies.Cesium.Cartesian3(radius, radius, radius),
+            stackPartitions: arc,
+            slicePartitions: arc,
+            vertexFormat: dependencies.Cesium.VertexFormat.POSITION_ONLY,
+            // vertexFormat: dependencies.Cesium.VertexFormat.POSITION_AND_NORMAL,
         });
+        // 用于记录几何蒙皮的顶点信息
+        this.earthVertex = null;
+    }
 
-        let fabric = {
-            fabric: {
-                type: "Image",
-                uniforms: {}
-            }
-        };
-
-        fabric.fabric.uniforms["origin"] = {
-            x: Coordinate.angleToRadian(this.originX),
-            y: Coordinate.angleToRadian(this.originY)
-        };
-
-        fabric.fabric.uniforms["interval"] = {
-            x: Coordinate.angleToRadian(this.xInterval),
-            y: Coordinate.angleToRadian(this.yInterval)
-        };
-
-        fabric.fabric.uniforms["gridSize"] = {x: this.xGridSize, y: this.yGridSize};
-
-        fabric.fabric.uniforms["controlNumber"] = {
-            x: this.minHeight,
-            y: this.maxHeight,
-            z: this.min,
-            w: this.max
-        };
-
-        let addStr = "";
-        let addStr2 = "";
-        fabric.fabric.uniforms["time"] = this.time;
-
-        if (!Check.Array(this.data)) {
-            fabric.fabric.uniforms["image"] = this.data;
-            addStr += "uniform sampler2D image_5;"
-            addStr2 += `vec4 getCurrentColor(in float time, in vec2 frac){return texture2D(image_5,frac);}`
-            addStr2 += `vec4 getNextColor(in float time, in vec2 frac){return texture2D(image_5,frac);}`
-            addStr2 += `float getStep(in float time){return 0.;}`
-        } else {
-            for (let i = 0; i < this.data.length; i++) {
-                fabric.fabric.uniforms["image_" + i] = this.data[i];
-                addStr += `uniform sampler2D image_${i}_${5 + i};`
-            }
-            addStr2 += `vec4 getCurrentColor(in float time, in vec2 frac){${this._loadShader(this.data.length, 0)}}`;
-            addStr2 += `vec4 getNextColor(in float time, in vec2 frac){${this._loadShader(this.data.length, 1)}}`;
-            // addStr2 += `float getStep(in float time){${this._loadShader(this.data.length, 2)}}`;
-            addStr2 += `float getStep(in float time){return 0.;}`;
+    draw() {
+        const gl = this.gl;
+        if (this.earthVertex === null) {
+            this.generateVertex();
         }
 
-        this.primitive = new dependencies.Cesium.Primitive({
-            geometryInstances: geometry,
-            show: this.show,
-            appearance: new dependencies.Cesium.MaterialAppearance({
-                material: new dependencies.Cesium.Material(fabric),
-                fragmentShaderSource: loadToString.toString(DrawGridFS),
-                vertexShaderSource: addStr + addStr2 +loadToString.toString(DrawGridVS),
-                aboveGround: true
-            }),
-            modelMatrix: MovePrimitive.Mat(),
-        });
-
-        let origin = this.primitive.update;
-        this.primitive.update = (frameState) => {
-            this.primitive.appearance.material.uniforms['time'] = this.time;
-            origin.call(this.primitive, frameState);
+        if (this.destroied === true) {
+            return;
         }
 
-        this.primitiveCollection.add(this.primitive);
+        gl.disable(gl.DEPTH_TEST);
+        gl.disable(gl.STENCIL_TEST);
+        gl.enable(gl.BLEND);
+        gl.enable(gl.CULL_FACE);
+
+        this.drawSphere();
     }
 
-    _loadShader(length, type) {
-        let str = `float count = time * ${length}.0;`
-        switch (type) {
-            case 0:
-                str += `count = floor(count);`
-                for (let i = 0; i < length; i++) {
-                    str += `if(count == ${i}.0){ return texture2D(image_${i}_${5 + i},frac);}`
-                }
-                break;
-            case 1:
-                str += `count = ceil(count);`
-                for (let i = 0; i < length; i++) {
-                    str += `if(count == ${i}.0){  return texture2D(image_${i}_${5 + i},frac);}`
-                }
-                break;
-            case 2:
-                str += `return fract(count);`
-                break;
+    drawSphere() {
+        const gl = this.gl;
+        const program = this.EarthShader;
+        const us = this.context._us;
+
+        gl.useProgram(program.program);
+
+        GLUtil.bindAttribute(gl, this.earthVertexHighBuffer, program["v_posHeigh"], 3);
+        GLUtil.bindAttribute(gl, this.earthVertexLowBuffer, program["v_posLow"], 3);
+        // GLUtil.bindAttribute(gl, this.earthVertexNormalBuffer, program["normal"], 3);
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.earthIndexBuffer);
+
+        // gl.uniform1f(program.gamma, us.gamma);
+
+        let hight = us.encodedCameraPositionMCHigh;
+        gl.uniform3f(program.encodedCameraPositionMCHigh, hight.x, hight.y, hight.z);
+        let low = us.encodedCameraPositionMCLow;
+        gl.uniform3f(program.encodedCameraPositionMCLow, low.x, low.y, low.z);
+
+        // gl.uniform1fv(program.pops, [50.0, 20.0, 30.0, 40.0]);
+
+        gl.uniformMatrix4fv(program.modelViewProjectionRelativeToEye, false, dependencies.Cesium.Matrix4.toArray(us.modelViewProjectionRelativeToEye));
+        // gl.uniformMatrix4fv(program.modelViewRelativeToEye, false, dependencies.Cesium.Matrix4.toArray(us.modelViewRelativeToEye));
+
+        gl.drawElements(gl.TRIANGLES, this.earthVertex.indices.length, gl.UNSIGNED_INT, 0);
+        // gl.drawElements(gl.TRIANGLES, this.earthVertex.indices.length, gl.UNSIGNED_BYTE, 0);
+    }
+
+    /**
+     * 用于生成几何蒙皮的顶点信息
+     * @date 2019/5/8
+     * @methodOf: WindVisShader
+     */
+    generateVertex() {
+        if (this.earthVertex === null) {
+            this.earthVertex = dependencies.Cesium.EllipsoidGeometry.createGeometry(this.earthGeo);
+            this.earthVertex = dependencies.Cesium.GeometryPipeline.encodeAttribute(this.earthVertex, 'position', 'position3DHigh', 'position3DLow');
+            this.earthIndexBuffer = GLUtil.createBuffer(this.gl, this.earthVertex.indices, this.gl.ELEMENT_ARRAY_BUFFER, this.gl.STATIC_DRAW);
+            // this.earthVertexNormalBuffer = GLUtil.createBuffer(this.gl, this.earthVertex.attributes.normal.values, this.gl.ARRAY_BUFFER, this.gl.STATIC_DRAW);
+            this.earthVertexHighBuffer = GLUtil.createBuffer(this.gl, this.earthVertex.attributes.position3DHigh.values, this.gl.ARRAY_BUFFER, this.gl.STATIC_DRAW);
+            this.earthVertexLowBuffer = GLUtil.createBuffer(this.gl, this.earthVertex.attributes.position3DLow.values, this.gl.ARRAY_BUFFER, this.gl.STATIC_DRAW);
         }
-        return str;
-    }
-
-    _reboundLon(lon) {
-        return lon;
-    }
-
-    _reboundLat(lat) {
-        return lat;
-    }
-
-    setProperty(obj) {
-        ObjectUtil.setProperties(this, obj);
-    }
-
-    setMaxHeight(maxHeight) {
-        this.maxHeight = Check.number(maxHeight) ? maxHeight : 300000;
-        return this;
-    }
-
-
-    setMinHeight(minHeight) {
-        this.minHeight = Check.number(minHeight) ? minHeight : 200000;
-        return this;
-    }
-
-    setData(data) {
-        if (Check.checkDefined(data)) {
-            this.data = data;
-        } else {
-            throw new Error(" data is needed!")
-        }
-        return this;
-    }
-
-    setOriginY(originY) {
-        this.originY = Check.number(originY) ? originY : 0;
-        return this;
-    }
-
-    setOriginX(originX) {
-        this.originX = Check.number(originX) ? originX : 0;
-        return this;
-    }
-
-    setYInterval(yInterval) {
-        this.yInterval = Check.number(yInterval) ? yInterval : 0;
-        return this;
-    }
-
-    setXInterval(xInterval) {
-        this.xInterval = Check.number(xInterval) ? xInterval : 0;
-        return this;
-    }
-
-    setYGridSize(yGridSize) {
-        this.yGridSize = Check.number(yGridSize) ? yGridSize : 0;
-        return this;
-    }
-
-    setXGridSize(xGridSize) {
-        this.xGridSize = Check.number(xGridSize) ? xGridSize : 0;
-        return this;
-    }
-
-    setHeight(height) {
-        this.height = Check.number(height) ? height : 10;
-        return this;
-    }
-
-    setColorScheme(colorScheme) {
-        if (Check.Array(colorScheme)) {
-            this.colorScheme = colorScheme;
-        } else if (Check.string(colorScheme)) {
-            this.colorScheme = colorScheme.split(',');
-        } else {
-            this.colorScheme = despDefaultColorArray;
-        }
-        return this;
-    }
-
-    setMin(min) {
-        this.min = Check.number(min) ? min : 0;
-        return this;
-    }
-
-    setMax(max) {
-        this.max = Check.number(max) ? max : 0;
-        return this;
-    }
-
-    setShow(show) {
-        this.show = show !== false;
-        return this;
-    }
-
-    delete() {
-        if (this.primitive !== null) {
-            this.primitiveCollection.remove(this.primitive);
-            this.primitive = null;
-        }
+        return this.earthVertex;
     }
 
     destroy() {
-        this.delete();
-        this.primitiveCollection = null;
+        if (Check.checkDefined(this.earthIndexBuffer)) {
+            GLUtil.deleteBuffer(this.gl, this.earthIndexBuffer);
+        }
+        // if (Check.checkDefined(this.earthVertexNormalBuffer)) {
+        //     GLUtil.deleteBuffer(this.gl, this.earthVertexNormalBuffer);
+        // }
+        if (Check.checkDefined(this.earthVertexHighBuffer)) {
+            GLUtil.deleteBuffer(this.gl, this.earthVertexHighBuffer);
+        }
+        if (Check.checkDefined(this.earthVertexLowBuffer)) {
+            GLUtil.deleteBuffer(this.gl, this.earthVertexLowBuffer);
+        }
+        if (Check.checkDefined(this.EarthShader)) {
+            GLUtil.deleteProgram(this.gl, this.EarthShader);
+        }
+        ObjectUtil.deleteComplete(this.earthVertex);
         ObjectUtil.delete(this);
+        this.destroied = true;
     }
+
 }
