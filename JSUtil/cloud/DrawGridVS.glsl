@@ -161,7 +161,6 @@ vec4 lerpColor (in vec4 current, in vec4 next, in float step){
     return ret;
 }
 
-
 void main(){
     vec4 p = vec4(recover(), 0.);
 
