@@ -91,38 +91,56 @@ export default class DrawGrid {
             addStr2 += `float getStep(in float time){return 0.;}`
         } else {
             for (let i = 0; i < this.data.length; i++) {
-                fabric.fabric.uniforms["image_" + i] = this.data[i];
+                if (Check.function(this.data[i])) {
+                    fabric.fabric.uniforms["image_" + i] = this.data[i]();
+                } else {
+                    fabric.fabric.uniforms["image_" + i] = this.data[i];
+                }
                 addStr += `uniform sampler2D image_${i}_${5 + i};`
             }
             addStr2 += `vec4 getCurrentColor(in float time, in vec2 frac){${this._loadShader(this.data.length, 0)}}`;
             addStr2 += `vec4 getNextColor(in float time, in vec2 frac){${this._loadShader(this.data.length, 1)}}`;
-            // addStr2 += `float getStep(in float time){${this._loadShader(this.data.length, 2)}}`;
-            addStr2 += `float getStep(in float time){return 0.;}`;
+            if (this.needLerp) {
+                addStr2 += `float getStep(in float time){${this._loadShader(this.data.length, 2)}}`;
+            } else {
+                addStr2 += `float getStep(in float time){return 0.;}`;
+            }
         }
 
-        this.primitive = new dependencies.Cesium.Primitive({
+        let primitive = new dependencies.Cesium.Primitive({
             geometryInstances: geometry,
             show: this.show,
             appearance: new dependencies.Cesium.MaterialAppearance({
                 material: new dependencies.Cesium.Material(fabric),
                 fragmentShaderSource: loadToString.toString(DrawGridFS),
-                vertexShaderSource: addStr + addStr2 +loadToString.toString(DrawGridVS),
+                vertexShaderSource: addStr + addStr2 + loadToString.toString(DrawGridVS),
                 aboveGround: true
             }),
             modelMatrix: MovePrimitive.Mat(),
         });
 
-        let origin = this.primitive.update;
-        this.primitive.update = (frameState) => {
-            this.primitive.appearance.material.uniforms['time'] = this.time;
-            origin.call(this.primitive, frameState);
+        let origin = primitive.update;
+        primitive.update = (frameState) => {
+            primitive.appearance.material.uniforms['time'] = this.time;
+            if (Check.Array(this.data)) {
+                for (let i = 0; i < this.data.length; i++) {
+                    if (Check.function(this.data[i])) {
+                        primitive.appearance.material.uniforms["image_" + i] = this.data[i]();
+                    }
+                }
+            }
+            origin.call(primitive, frameState);
         }
 
-        this.primitiveCollection.add(this.primitive);
+        this.primitiveCollection.add(primitive);
+
+        this.removeCallback = () => {
+            this.primitiveCollection.remove(primitive);
+        }
     }
 
     _loadShader(length, type) {
-        let str = `float count = time * ${length}.0;`
+        let str = `float count = time * ${length - 1}.0;`
         switch (type) {
             case 0:
                 str += `count = floor(count);`
@@ -153,6 +171,11 @@ export default class DrawGrid {
 
     setProperty(obj) {
         ObjectUtil.setProperties(this, obj);
+    }
+
+    setNeedLerp(needLerp) {
+        this.needLerp = needLerp !== false;
+        return this;
     }
 
     setMaxHeight(maxHeight) {
@@ -237,9 +260,8 @@ export default class DrawGrid {
     }
 
     delete() {
-        if (this.primitive !== null) {
-            this.primitiveCollection.remove(this.primitive);
-            this.primitive = null;
+        if (this.removeCallback) {
+            this.removeCallback();
         }
     }
 
