@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<RevitAddIns>
+  <AddIn Type="Command">
+    <Text>导出CLM</Text>
+    <Description>rvt导出为cesiumlab中间模型格式clm</Description>
+    <Assembly>revit2clm.exe</Assembly>
+    <FullClassName>revit2clm.ClmCommand</FullClassName>
+    <ClientId>075DE6CD-FB77-4D8D-8E4A-56D7CF376139</ClientId>
+    <VendorId>com.bjxbsj.cesiumlab</VendorId>
+    <VendorDescription>http://www.cesiumlab.com</VendorDescription>
+  </AddIn>
+  <AddIn Type="Application">
+    <Name>revit2clm</Name>
+    <Description>rvt导出为cesiumlab中间模型格式clm</Description>
+    <Assembly>revit2clm.exe</Assembly>
+    <FullClassName>revit2clm.ClmApplication</FullClassName>
+    <ClientId>CA9DBAE3-602C-44B3-BEB2-9718F8FEB69A</ClientId>
+    <VendorId>com.bjxbsj.cesiumlab</VendorId>
+    <VendorDescription>http://www.cesiumlab.com</VendorDescription>
+  </AddIn>
+</RevitAddIns>

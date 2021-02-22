@@ -1,0 +1,13 @@
+{
+  "AngleTolerance": 0.5,
+  "ChordTolerance": 500,
+  "MaxFacetWidth": 100,
+  "MaxEdgeLength": 100,
+  "MinPerBezier": 0,
+  "MaxPerBezier": 0,
+  "MaxPerFace": 3,
+  "CurvatureWeightFactor": 0,
+  "ParamDistanceScale": 1,
+  "ToleranceDistanceScale": 1,
+  "CurvedSurfaceMaxPerFace": 3
+}
