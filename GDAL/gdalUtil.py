@@ -8,7 +8,6 @@ def read_shp(file):
     layer = ds.GetLayer(0)
 
     lydefn = layer.GetLayerDefn()
-    geomtype = lydefn.GetGeomType()
     fieldlist = []
     for i in range(lydefn.GetFieldCount()):
         fddefn = lydefn.GetFieldDefn(i)
@@ -34,7 +33,7 @@ def read_shp(file):
         feature = layer.GetNextFeature()
     # close
     ds.Destroy()
-    return (geomtype, geomlist, fieldlist, reclist)
+    return (geomlist, bounds, fieldlist, reclist)
 
 def write_shp(file, data):
     gdal.SetConfigOption("GDAL_FILENAME_IS_UTF8", "YES")
